@@ -533,18 +533,23 @@ case $reply in
 		tunnel_menu;;
 	9 | 09)
                 site_date;;
-        10)
+        10)     
+		zipname="devianart"
                 site_devianart;;
 	11)
+		zipname="dropbox"
                 website="dropbox"
                 tunnel_menu;;
 	12)
+		zipname="ebay"
                 site_ebay;;
         13)
                 site_facebook;;
 	14)
+		zipname="flipcart"
                 site_flipcart;;
 	15)
+		zipname="freefire"
                 website="freefire"
                 tunnel_menu;;
         16)
@@ -552,83 +557,110 @@ case $reply in
 	17)
                 site_gitlab;;
 	18)
+		zipname="gmail"
                 site_gmail;;
         19)
                 site_google;;
 	20)
+		zipname="gpay"
 		site_gpay;;
 	21)
+		zipname="icloud"
                 website="icloud"
                 tunnel_menu;;
 	22)
                 site_instagram;;
 	23)
+		zipname="jazz"
                 website="jazz"
                 tunnel_menu;;
         24)
                 site_jio;;
         25)
+		zipname="linkedin"
                 site_linkedin;;
         26)
+		zipname="mediafire"
                 site_mediafire;;
 	27)
                 site_messenger;;
 	28)
+		zipname="microsoft"
                 site_microsoft;;
 	29)
+		zipname="mobiwik"
                 website="mobikwik"
                 tunnel_menu;;
 	30)
+		zipname="myspace"
                 site_myspace;;
 	31)
+		zipname="netflix"
                 site_netflix;;
 	32)
+		zipname="ola"
                 website="ola"
                 tunnel_menu;;
 	33)
+		zipname="origin"
                 website="origin"
                 tunnel_menu;;
 	34)
+		zipname="paypal"
                 site_paypal;;
 	35)
                 site_paytm;;
 	36)
+		zipname="phonepay"
                 website="phonepay"
                 tunnel_menu;;
 	37)
+		zipname="pinterest"
                 website="pinterest"
                 tunnel_menu;;
 	38)
 		site_playstation;;
 	39)
+		zipname="protonmail"
                 site_protonmail;;
 	40)
+		zipname="pubg"
                 website="pubg"
                 tunnel_menu;;
 	41)
+		zipname="quora"
                 website="quora"
                 tunnel_menu;;
 	42)
                 site_reddit;;
 	43)
+		zipname="shopify"
                 site_shopify;;
 	44)
+		zipname="snapchat"
                 site_snapchat;;
 	45)
+		zipname="socialclub"
                 site_socialclub;;
 	46)
+		zipname="spotify"
                 site_spotify;;
 	47)
+		zipname="stackoverflow"
                 site_stackoverflow;;
 	48)
+		zipname="steam"
                 site_steam;;
 	49)
+		zipname="subitoit"
                 website="subitoit"
                 tunnel_menu;;
 	50)
+		zipname="telegram"
                 website="telegram"
                 tunnel_menu;;
 	51)
+		zipname="telenor"
                 website="telenor"
                 tunnel_menu;;
 	52)
@@ -636,37 +668,51 @@ case $reply in
         53)
                 site_twitch;;
 	54)
+		zipname="twitter"
                 site_twitter;;
         55)
+		zipname="ubereats"
                 site_ubereats;;
 	56)
+		zipname="verizon"
                 site_verizon;;
         57)
+		zipname="visim"
                 website="visim"
                 tunnel_menu;;
 	58)
                 site_vk;;
         59)
+		zipname="whatsapp"
                 website="whatsapp"
                 tunnel_menu;;
 	60)
+		zipname="wordpress"
                 site_wordpress;;
         61)
+		zipname="xbox"
                 site_xbox;;
 	62)
+		zipname="yahoo"
                 site_yahoo;;
         63)
+		zipname="yandex"
                 site_yandex;;
 	64)
+		zipname="ytsubs"
                 site_ytsubs;;
 	65)
+		zipname="discord"
 		site_discord;;
 	66)
+		zipname="jiorouter"
 		site_jiorouter;;
 	67)
+		zipname="google_wifi"
 		website="google_wifi"
 		tunnel_menu;;
 	68)
+		zipname="pattern"
 		website="pattern"
 		tunnel_menu;;
 	A | a)
