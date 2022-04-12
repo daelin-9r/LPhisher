@@ -38,7 +38,7 @@
 
 <h3><p align="center">Disclaimer</p></h3>
 
-<i>Any actions and or activities related to <b>Nphisher</b> is solely your responsibility. The misuse of this toolkit can result in <b>criminal charges</b> brought against the persons in question. <b>The contributors will not be held responsible</b> in the event any criminal charges be brought against any individuals misusing this toolkit to break the law.
+<i>Any actions and or activities related to <b>Lphisher</b> is solely your responsibility. The misuse of this toolkit can result in <b>criminal charges</b> brought against the persons in question. <b>The contributors will not be held responsible</b> in the event any criminal charges be brought against any individuals misusing this toolkit to break the law.
 
 <b>This toolkit contains materials that can be potentially damaging or dangerous for social media</b>. Refer to the laws in your province/country before accessing, using,or in any other way utilizing this in a wrong way.
 
@@ -49,39 +49,43 @@ It only demonstrates "how phishing works". <b>You shall not misuse the informati
 ##
 
 ## ABOUT TOOL:
-NPhisher is the most powerful phishing site. it has lots of advantages. Give it a try.
+LPhisher is the most powerful and lightest phishing tool. it has lots of advantages. Give it a try.
  
-### What makes Nphisher so powerful:
+### What makes Lphisher so powerful:
+* Very light - less than 1mb
 * Has 150+ Phishing Options
 * Has OTP phishing function
 * Saves the logs and manages it
 * User friendly
 * More than you think
 
+### What makes Lphisher so light:
+<i> <b> LPhisher </b> does not have sites in default, once you select with site you want to phish it downloads the site from module page and run it. Once your done it delete the site, and then process continues</i>
+
 ## TESTED ON:
 ***NOTE: This tool is not tested completely***
 * Termux
 
 ## REQUIRMENTS:
-* Internet 
-* Storage 300 MB
+* Internet - Always
+* Storage 50 MB max
 
 ## INSTALLATION :
 
 * `apt-get update -y`
 * `apt-get upgrade -y`
 * `pkg install git -y`
-* `git clone https://github.com/rdxlr/NPhisher`
-* `cd NPhisher`
+* `git clone https://github.com/rdxlr/LPhisher`
+* `cd LPhisher`
 * `ls`
-* `bash nphisher.sh`
+* `bash lphisher.sh`
 
 ## Docker Installation :
-* `docker pull rdxlr/nphisher`
-* `docker run --rm -it rdxlr/nphisher`
+* `docker pull rdxlr/lphisher`
+* `docker run --rm -it rdxlr/lphisher`
 
 ## Dependencies
-**`Nphisher`** requires following programs to run properly - 
+**`Lphisher`** requires following programs to run properly - 
 - `php`
 - `wget`
 - `curl`
