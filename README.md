@@ -1,6 +1,7 @@
 <p align="center">
 <a href="https://github.com/rdxlr"><img title="Github" src="https://img.shields.io/badge/rdxlr-grey?style=for-the-badge&logo=github"></a>
-<a href="https://github.com/rdxlr/lphisher"><img title="Github" src="https://img.shields.io/badge/LPhisher-blue?style=for-the-badge"></a>
+<a href="https://github.com/rdxlr/lphisher"><img title="Github" src="https://img.shields.io/badge/L-yellow?style=for-the-badge"></a>
+<a href="https://github.com/rdxlr/lphisher"><img title="Github" src="https://img.shields.io/badge/Phisher-blue?style=for-the-badge"></a>
 </p>
 
 <p align="center">
