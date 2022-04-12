@@ -96,6 +96,10 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 ## THINGS TO BE DONE:
 *** Nothing to be done now... ***
 
+## SCREENSHOTS :
+<p align="center">
+<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/screenshots/lphisher/ss1.jpg">
+</p>
 ## THANKS TO : 
 
 * MRPHISH TOOL FOR PAGES
