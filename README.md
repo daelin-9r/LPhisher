@@ -53,7 +53,7 @@ It only demonstrates "how phishing works". <b>You shall not misuse the informati
 LPhisher is the most powerful and lightest phishing tool. it has lots of advantages. Give it a try.
  
 ### What makes Lphisher so powerful:
-* Very light - less than 1mb
+* Very light - less than 5mb
 * Has 150+ Phishing Options
 * Has OTP phishing function
 * Saves the logs and manages it
