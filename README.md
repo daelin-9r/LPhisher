@@ -11,8 +11,7 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/RDXLR/LPhisher/main/core/pics/banner.png">
 </p>
-
-## Light as a feather 🪶
+<h3><p align="center">LIGHT AS A FEATHER 🪶 </p></h3>
 
 <p align="center">
 <a href="https://github.com/rdxlr"><img title="Language" src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg?v=103"></a>
