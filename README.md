@@ -66,6 +66,7 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 ## TESTED ON:
 ***NOTE: This tool is not tested completely***
 * Termux
+* Linux
 
 ## REQUIRMENTS:
 * Internet - Always
