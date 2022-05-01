@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/RDXLR/LPhisher/main/core/pics/banner.png">
+<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/pics/banner.png">
 </p>
 <h3><p align="center">LIGHT AS A FEATHER 🪶 </p></h3>
 
@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/RDXLR/LPhisher/main/core/pics/poster.png">
+<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/core/lphisher/poster.png">
 </p>
 
 ##
