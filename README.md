@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/pics/poster.png
+<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/pics/poster.png">
 </p>
 
 ##
