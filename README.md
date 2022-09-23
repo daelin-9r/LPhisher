@@ -74,8 +74,7 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 * Internet - Always
 * Storage 50 MB max
 
-## INSTALLATION :
-
+## INSTALLATION - Termux:
 * `apt-get update -y`
 * `apt-get upgrade -y`
 * `pkg install git -y`
@@ -83,6 +82,15 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 * `cd LPhisher`
 * `ls`
 * `bash lphisher.sh`
+
+## INSTALLATION - Kali :
+* `apt-get update -y`
+* `apt-get upgrade -y`
+* `apt install git -y`
+* `git clone https://github.com/rdxlr/LPhisher`
+* `cd LPhisher`
+* `ls`
+* `sudo bash lphisher.sh`
 
 ## Docker Installation :
 * `docker pull rdxlr/lphisher`
