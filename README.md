@@ -1,40 +1,40 @@
-<link rel="icon" type="image/x-icon" href="https://rdxlr.github.io/logo/favicon.ico">
+<link rel="icon" type="image/x-icon" href="https://Alygnt.github.io/logo/favicon.ico">
 
 <p align="center">
-<a href="https://github.com/rdxlr"><img title="Github" src="https://img.shields.io/badge/rdxlr-grey?style=for-the-badge&logo=github"></a>
-<a href="https://github.com/rdxlr/lphisher"><img title="Github" src="https://img.shields.io/badge/L-yellow?style=for-the-badge"></a>
-<a href="https://github.com/rdxlr/lphisher"><img title="Github" src="https://img.shields.io/badge/Phisher-blue?style=for-the-badge"></a>
+<a href="https://github.com/Alygnt"><img title="Github" src="https://img.shields.io/badge/Alygnt-grey?style=for-the-badge&logo=github"></a>
+<a href="https://github.com/Alygnt/lphisher"><img title="Github" src="https://img.shields.io/badge/L-yellow?style=for-the-badge"></a>
+<a href="https://github.com/Alygnt/lphisher"><img title="Github" src="https://img.shields.io/badge/Phisher-blue?style=for-the-badge"></a>
 </p>
 
 <p align="center">
-<a href="https://github.com/RDXLR/LPhisher"><img title="Version" src="https://img.shields.io/badge/Version-1.0-green.svg"></a>
-<a href="https://github.com/RDXLR/LPhisher"><img title="Maintainence" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"></a>
+<a href="https://github.com/Alygnt/LPhisher"><img title="Version" src="https://img.shields.io/badge/Version-1.0-green.svg"></a>
+<a href="https://github.com/Alygnt/LPhisher"><img title="Maintainence" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"></a>
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/pics/banner.png">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/pics/banner.png">
 </p>
 <h3><p align="center">LIGHT AS A FEATHER 🪶 </p></h3>
 
 <p align="center">
-<a href="https://github.com/rdxlr"><img title="Language" src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg?v=103"></a>
-<a href="https://github.com/rdxlr"><img title="Language" src="https://img.shields.io/badge/Other%20Languages-Html, PHP, Javascript, CSS, etc-1f425f.svg?v=103"></a>
+<a href="https://github.com/Alygnt"><img title="Language" src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg?v=103"></a>
+<a href="https://github.com/Alygnt"><img title="Language" src="https://img.shields.io/badge/Other%20Languages-Html, PHP, Javascript, CSS, etc-1f425f.svg?v=103"></a>
 </p>
 
 <p align="center">
-<a href="https://github.com/rdxlr"><img title="Licence" src="https://img.shields.io/badge/License-GNU General Public License v3.0-blue.svg"></a>
+<a href="https://github.com/Alygnt"><img title="Licence" src="https://img.shields.io/badge/License-GNU General Public License v3.0-blue.svg"></a>
 </p>
 
 <p align="center">
-<a href="https://github.com/rdxlr"><img title="Followers" src="https://img.shields.io/github/followers/rdxlr?color=blue&style=flat-square"></a>
-<a href="https://github.com/rdxlr"><img title="Stars" src="https://img.shields.io/github/stars/rdxlr/lphisher?color=red&style=flat-square"></a>
-<a href="https://github.com/rdxlr"><img title="Forks" src="https://img.shields.io/github/forks/rdxlr/lphisher?color=red&style=flat-square"></a>
-<a href="https://github.com/rdxlr"><img title="Issues" src="https://img.shields.io/github/issues/rdxlr/lphisher?color=red&style=flat-square"></a>
-<a href="https://github.com/rdxlr"><img title="Watching" src="https://img.shields.io/github/watchers/rdxlr/lphisher?label=Watchers&color=blue&style=flat-square"></a>
+<a href="https://github.com/Alygnt"><img title="Followers" src="https://img.shields.io/github/followers/Alygnt?color=blue&style=flat-square"></a>
+<a href="https://github.com/Alygnt"><img title="Stars" src="https://img.shields.io/github/stars/Alygnt/lphisher?color=red&style=flat-square"></a>
+<a href="https://github.com/Alygnt"><img title="Forks" src="https://img.shields.io/github/forks/Alygnt/lphisher?color=red&style=flat-square"></a>
+<a href="https://github.com/Alygnt"><img title="Issues" src="https://img.shields.io/github/issues/Alygnt/lphisher?color=red&style=flat-square"></a>
+<a href="https://github.com/Alygnt"><img title="Watching" src="https://img.shields.io/github/watchers/Alygnt/lphisher?label=Watchers&color=blue&style=flat-square"></a>
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/pics/poster.png">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/pics/poster.png">
 </p>
 
 ##
@@ -78,7 +78,7 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 * `apt-get update -y`
 * `apt-get upgrade -y`
 * `pkg install git -y`
-* `git clone https://github.com/rdxlr/LPhisher`
+* `git clone https://github.com/Alygnt/LPhisher`
 * `cd LPhisher`
 * `ls`
 * `bash lphisher.sh`
@@ -87,14 +87,10 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 * `apt-get update -y`
 * `apt-get upgrade -y`
 * `apt install git -y`
-* `git clone https://github.com/rdxlr/LPhisher`
+* `git clone https://github.com/Alygnt/LPhisher`
 * `cd LPhisher`
 * `ls`
 * `sudo bash lphisher.sh`
-
-## Docker Installation :
-* `docker pull rdxlr/lphisher`
-* `docker run --rm -it rdxlr/lphisher`
 
 ## Dependencies
 **`Lphisher`** requires following programs to run properly - 
@@ -109,11 +105,11 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 
 ## SCREENSHOTS :
 <p align="center">
-<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/screenshots/ss1.jpg">
-<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/screenshots/ss2.jpg">
-<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/screenshots/ss3.jpg">
-<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/screenshots/ss4.jpg">
-<img src="https://raw.githubusercontent.com/RDXLR/phisher-modules/main/lphisher/screenshots/ss5.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss1.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss2.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss3.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss4.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss5.jpg">
 </p>
 
 ## THANKS TO : 
