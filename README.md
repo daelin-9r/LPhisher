@@ -34,7 +34,7 @@
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/pics/poster.png">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/pics/LPhisher-poster.png">
 </p>
 
 ##
