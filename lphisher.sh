@@ -869,10 +869,10 @@ case $reply in
 		website="pattern"
 		tunnel_menu;;
 	A | a)
-		xdg-open https://github.com/RDXLR/LPhisher
+		xdg-open https://github.com/Alygnt/LPhisher
                 { sleep 2; clear;  banner; mainmenu; };;
 	B | b | C | c)
-		xdg-open https://github.com/RDXLR/LPhisher/issues/new
+		xdg-open https://github.com/Alygnt/LPhisher/issues/new
 		{ sleep 2; clear; banner; mainmenu; };;
 	D | d)
 		if [ -f logs.dat ];then
