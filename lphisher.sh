@@ -56,7 +56,7 @@ cbanner(){
 	echo -e "${YELLOW} ╚════════╝${BLUE}╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝${NC}"
 	echo -e "${CYAN}                                                  By - ${RED}Alygnt${NC}"
 	echo -e "${CYAN}        ${NC} "
-	echo -e "${GREEN}                           Version 1.0 ${NC}"
+	echo -e "${GREEN}                           Version 1.1 ${NC}"
 	echo -e "${CYAN}        ${NC} "
 }
 #Small Banner
@@ -676,7 +676,7 @@ logs_check() {
 		logs_menu
 	else
 		echo "No logs found"
-		{ sleep 1; clear; tunnel_menu; }
+		{ sleep 1; clear; mainmenu; }
 	fi
 }
 logs_menu() {
