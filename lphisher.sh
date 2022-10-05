@@ -1,4 +1,3 @@
-
 ##COLOUR VARIABLES
 
 #Text
@@ -669,11 +668,11 @@ capture_data_3() {
 
 #Logs check
 logs_check() {
-	if [ -z "$(ls -A $DIR)" ]; then
+	if [ -z "$(ls -A /logs)" ]; then
 		logs_menu
 	else
 		echo "No logs found"
-		{ sleep 1; clear; tunnel_menu; }
+		{ sleep 1; clear; mainmenu; }
 	fi
 }
 logs_menu() {
