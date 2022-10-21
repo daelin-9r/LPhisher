@@ -74,23 +74,41 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 * Internet - Always
 * Storage 50 MB max
 
-## INSTALLATION - Termux:
-* `apt-get update -y`
-* `apt-get upgrade -y`
+## INSTALLATION 
+
+### Termux
+* `pkg update -y`
+* `pkg upgrade -y`
 * `pkg install git -y`
 * `git clone https://github.com/Alygnt/LPhisher`
 * `cd LPhisher`
-* `ls`
 * `bash lphisher.sh`
 
-## INSTALLATION - Kali :
-* `apt-get update -y`
-* `apt-get upgrade -y`
+### Kali Linux
+* `sudo apt update -y`
+* `sudo apt upgrade -y`
+* `sudo apt install git -y`
+* `git clone https://github.com/Alygnt/LPhisher`
+* `cd LPhisher`
+* `sudo bash lphisher.sh`
+  
+### Google cloud shell
+* `apt update -y`
+* `apt upgrade -y`
 * `apt install git -y`
 * `git clone https://github.com/Alygnt/LPhisher`
 * `cd LPhisher`
-* `ls`
-* `sudo bash lphisher.sh`
+* `bash lphisher.sh`
+
+**OR**
+
+- Click this:
+<p align="left">
+  <a href="https://shell.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/Alygnt/LPhisher.git&tutorial=README.md" target="_blank"><img src="https://gstatic.com/cloudssh/images/open-btn.svg"></a>
+  </p>
+  
+- And type:
+* `bash lphisher.sh`
 
 ## Dependencies
 **`Lphisher`** requires following programs to run properly - 
