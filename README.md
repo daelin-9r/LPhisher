@@ -116,7 +116,7 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 - `wget`
 - `curl`
 - `git`
->  All the dependencies will be installed automatically when you run `Nphisher` for the first time.
+>  All the dependencies will be installed automatically when you run `Lphisher` for the first time.
 
 ## THINGS TO BE DONE:
 *** Nothing to be done now... ***
