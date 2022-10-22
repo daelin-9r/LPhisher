@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/pics/banner.png">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/pics/banner.png">
 </p>
 <h3><p align="center">LIGHT AS A FEATHER 🪶 </p></h3>
 
@@ -34,7 +34,7 @@
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/pics/LPhisher-poster.png">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/pics/LPhisher-poster.png">
 </p>
 
 ##
@@ -123,11 +123,11 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 
 ## SCREENSHOTS :
 <p align="center">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss1.jpg">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss2.jpg">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss3.jpg">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss4.jpg">
-<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/main/lphisher/screenshots/ss5.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/screenshots/ss1.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/screenshots/ss2.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/screenshots/ss3.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/screenshots/ss4.jpg">
+<img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/screenshots/ss5.jpg">
 </p>
 
 ## THANKS TO : 
