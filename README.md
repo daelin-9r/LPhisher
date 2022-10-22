@@ -107,8 +107,8 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
   <a href="https://shell.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/Alygnt/LPhisher.git&tutorial=README.md" target="_blank"><img src="https://gstatic.com/cloudssh/images/open-btn.svg"></a>
   </p>
   
-- And type:
-* `bash lphisher.sh`
+- Run the tool:
+`bash lphisher.sh`
 
 ### Install via '.deb' file
 - Download `.deb` files from the [**Latest Release**](https://github.com/Alygnt/LPhisher/releases/latest)
