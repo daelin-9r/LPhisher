@@ -110,6 +110,34 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 - And type:
 * `bash lphisher.sh`
 
+### Install via '.deb' file
+- Download `.deb` files from the [**Latest Release**](https://github.com/Alygnt/LPhisher/releases/latest)
+- Install the `.deb` file by executing
+  ```
+  apt install <your path to deb file>
+  ```
+  Or
+  ```
+  dpkg -i <your path to deb file>
+  ```
+  - Run the tool by typing
+  `lphisher`
+
+### Install via '.deb' file (TERMUX)
+- Download `.deb` files from the [**Latest Release**](https://github.com/Alygnt/LPhisher/releases/latest)
+- Enable termux chroot
+  `termux-chroot`
+- Install the `.deb` file by executing
+  ```
+  apt install <your path to deb file>
+  ```
+  Or
+  ```
+  dpkg -i <your path to deb file>
+  ```
+  - Run the tool by typing
+  `lphisher`
+  
 ## Dependencies
 **`Lphisher`** requires following programs to run properly - 
 - `php`
