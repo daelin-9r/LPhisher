@@ -152,8 +152,26 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 - `git`
 >  All the dependencies will be installed automatically when you run `Lphisher` for the first time.
 
+## API's used
+- **GitHub API**
+- **ngrok.io** to tunnel the localhost
+- **cloudflare** to tunnel the localhost
+- **localxpose.io** to tunnel the localhost
+- **ipwhois.app** to get IP details
+- **is.gd** to shorten url
+- **shrtco.de** to shorten url
+- **tinyurl.com** to shorten url
+
+  
 ## THINGS TO BE DONE:
-*** Nothing to be done now... ***
+- Network check before starting tunneler
+  
+**Give your suggestions in issues**
+
+  
+## Bugs recognized (need to be fixed):
+**All identified bugs has been fixed**
+
 
 ## SCREENSHOTS :
 <p align="center">
@@ -164,11 +182,24 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 <img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/screenshots/ss5.jpg">
 </p>
 
-## THANKS TO : 
+  
 
+## Don't have proper internet connection?? Use <a href="https://github.com/Alygnt/NPhisher">NPhisher</a>
+  
+<p align="center">
+<a href="https://github.com/Alygnt/NPhisher"><img title="LPhisher" src="https://raw.githubusercontent.com/Alygnt/phisher-modules/nphisher/pics/NPhisher-poster.png"></a>
+</p>
+  
+### Difference between NPhisher and LPhisher
+  
+|    NPhisher   |    LPhisher   |
+| ------------- | ------------- |
+| Installation size : approx 250 mb  | Installation size : less than 1mb  |
+| Minimum storage required : 300mb  | Minimum storage required : 50mb  |
+| Internet connection : Only for tunneling and shortening link  | Internet connection : Always  |
+
+## THANKS TO :
 * MRPHISH TOOL FOR PAGES
-
 * ZPHISHER TOOL FOR PAGES
-
 ## WARNING : 
 ***This tool is only for educational purpose. If you use this tool for other purposes except education we will not be responsible in such cases.***
