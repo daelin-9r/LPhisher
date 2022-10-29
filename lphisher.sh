@@ -54,7 +54,7 @@ cbanner(){
 	echo -e "${YELLOW} ╚════════╝${BLUE}╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝${NC}"
 	echo -e "${CYAN}                                                  By - ${RED}Alygnt${NC}"
 	echo -e "${CYAN}        ${NC} "
-	echo -e "${GREEN}                           Version 1.2 ${NC}"
+	echo -e "${GREEN}                           Version 1.3 ${NC}"
 	echo -e "${CYAN}        ${NC} "
 }
 #Small Banner
