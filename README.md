@@ -49,7 +49,7 @@
 
 It only demonstrates "how phishing works". <b>You shall not misuse the information to gain unauthorized access to someones social media</b>. However you may try out this at your own risk.</i>
 
-##
+<br>
 
 ## ABOUT TOOL:
 LPhisher is the most powerful and lightest phishing tool. it has lots of advantages. Give it a try.
@@ -65,14 +65,20 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 ### What makes Lphisher so light:
 <i> <b> LPhisher </b> does not have sites in default, once you select with site you want to phish it downloads the site from module page and run it. Once your done it delete the site, and then process continues</i>
 
+<br>
+
 ## TESTED ON:
 ***NOTE: This tool is not tested completely***
 * Termux
 * Linux
 
+<br>
+
 ## REQUIRMENTS:
 * Internet - Always
 * Storage 50 MB max
+
+<br>
 
 ## INSTALLATION 
 
@@ -143,7 +149,9 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
   ```
   lphisher
   ```
-  
+
+<br> 
+
 ## Dependencies
 **`Lphisher`** requires following programs to run properly - 
 - `php`
@@ -151,6 +159,8 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 - `curl`
 - `git`
 >  All the dependencies will be installed automatically when you run `Lphisher` for the first time.
+
+<br>
 
 ## API's used
 - **GitHub API**
@@ -162,16 +172,27 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 - **shrtco.de** to shorten url
 - **tinyurl.com** to shorten url
 
-  
+<br>
+
 ## THINGS TO BE DONE:
+- Mails you the login details 
 - Network check before starting tunneler
-  
+- To change type to number from password in few otp pages
+- To display users ip in main menu
+- Instagram OTP phishing page fix
+- Custom redirect Url
+- Ngrok no hotspot verion 
+- User's device ip display in main menu
+- Custom redirect page
+- Google with email, phone number, password and otp
 **Give your suggestions in issues**
 
-  
+<br>
+
 ## Bugs recognized (need to be fixed):
 **All identified bugs has been fixed**
 
+<br>
 
 ## SCREENSHOTS :
 <p align="center">
@@ -182,7 +203,8 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 <img src="https://raw.githubusercontent.com/Alygnt/phisher-modules/lphisher/screenshots/ss5.jpg">
 </p>
 
-  
+<br>
+<br>
 
 ## Don't have proper internet connection?? Use <a href="https://github.com/Alygnt/NPhisher">NPhisher</a>
   
@@ -197,6 +219,8 @@ LPhisher is the most powerful and lightest phishing tool. it has lots of advanta
 | Installation size : approx 250 mb  | Installation size : less than 1mb  |
 | Minimum storage required : 300mb  | Minimum storage required : 50mb  |
 | Internet connection : Only for tunneling and shortening link  | Internet connection : Always  |
+
+<br>
 
 ## THANKS TO :
 * MRPHISH TOOL FOR PAGES
